@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "checkJs": false,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "lib": ["es2017", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "outDir": "dist",
+    "preserveConstEnums": true,
+    "pretty": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "target": "es2015",
+    "resolveJsonModule": true,
+    "paths": {
+      "@event-inc/private::types": ["./libs-private/data-models"],
+      "@event-inc/*": ["./packages/*"],
+      "@libs-private/*": ["./libs-private/*"],
+      "@apps/*": ["./apps/*"],
+      "@event-inc/constants": ["./libs-private/constants"]
+    }
+  },
+  "include": ["./**/*"],
+  "exclude": []
+}

@@ -1,0 +1,136 @@
+export interface Author {
+  _id: string;
+  name?: string;
+  avatar?: string;
+  [x: string]: unknown;
+}
+export interface Ownership {
+  buildableId: string;
+  clientId?: string;
+  projectId?: string;
+  organizationId?: string;
+  author?: Author;
+  userId?: string;
+}
+
+export interface EventLink {
+  _id?: string;
+  version: string;
+  ownership: Ownership;
+  label: string;
+  group: string;
+  token: string;
+  createdAt: number;
+  createdDate: Date;
+  updatedAt?: number;
+  expiresAt: number;
+  environment?: string;
+  usageSource?: string;
+  _type: string;
+}
+
+export type CreateEventLinkPayload = {
+  version?: string;
+  label?: string;
+  group: string;
+  ttl?: number;
+  environment?: string;
+  usageSource?: string;
+};
+
+export interface ConnectionDefinition {
+  authMethod: object | null; // You can specify the correct data type for authMethod if needed
+  _id: string;
+  platformVersion: string;
+  platform: string;
+  type: string;
+  name: string;
+  authSecrets: any[]; // You can specify the correct data type for authSecrets if needed
+  frontend: {
+    spec: {
+      title: string;
+      description: string;
+      platform: string;
+      category: string;
+      image: string;
+      tags: string[];
+    };
+    connectionForm: {
+      name: string;
+      description: string;
+      formData: any[]; // You can specify the correct data type for formData if needed
+    };
+  };
+  paths: {
+    id: any; // You can specify the correct data type for id if needed
+    event: any; // You can specify the correct data type for event if needed
+    payload: any; // You can specify the correct data type for payload if needed
+    timestamp: string;
+    secret: string;
+    signature: any; // You can specify the correct data type for signature if needed
+    cursor: any; // You can specify the correct data type for cursor if needed
+  };
+  settings: {
+    parseWebhookBody: boolean;
+    showSecret: boolean;
+    allowCustomEvents: boolean;
+    oauth: boolean;
+  };
+  hidden: boolean;
+  testConnection: any; // You can specify the correct data type for testConnection if needed
+  createdAt: number;
+  updatedAt: number;
+  updated: boolean;
+  version: string;
+  lastModifiedBy: string;
+  deleted: boolean;
+  changeLog: Record<string, any>; // Assuming changeLog is a dictionary
+  tags: string[]; // You can specify the correct data type for tags if needed
+  active: boolean;
+  deprecated: boolean;
+}
+
+export interface ConnectionDefinitions {
+  rows: ConnectionDefinition[];
+  limit: number;
+  skip: number;
+  total: number;
+}
+
+export interface Platform {
+  type: string;
+  title: string;
+  connectionDefinitionId: string;
+  active?: boolean;
+  image: string;
+  activatedAt?: number;
+  secretsServiceId?: string;
+  secret?: {
+    clientId: string;
+    clientSecretDisplay: string;
+  };
+}
+
+export interface EmbedTokenRecord {
+  linkSettings: {
+    connectedPlatforms: Platform[];
+    eventIncToken: string;
+  };
+  label: string;
+  group: string;
+  createdAt: number;
+  createdDate: Date;
+  updatedAt?: number;
+  expiresAt?: number;
+  environment: string;
+}
+
+export interface LinkSettings {
+  _id?: string;
+  ownership: Ownership;
+  connectedPlatforms: Platform[];
+  createdAt: number;
+  updatedAt: number;
+  createdDate: Date;
+  updatedDate: Date;
+}

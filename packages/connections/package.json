@@ -1,0 +1,51 @@
+{
+  "name": "@integrationos/authkit-node",
+  "version": "1.0.4",
+  "description": "Secure token generation for IntegrationOS AuthKit",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "keywords": [
+    "integrationos",
+    "integrations",
+    "unified api"
+  ],
+  "author": "@integrationos",
+  "license": "MIT",
+  "dependencies": {
+    "@types/ramda": "^0.28.22",
+    "axios": "^0.26.1",
+    "lodash.ismatch": "^4.4.0",
+    "lodash.memoize": "^4.1.2",
+    "ramda": "^0.28.0",
+    "tslib": "^2.4.1",
+    "jsonwebtoken": "^9.0.1",
+    "jwt-decode": "^3.1.2",
+    "@integrationos/rust-utils": "^1.1.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.9",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/lodash.ismatch": "^4.4.7",
+    "@types/lodash.memoize": "^4.1.7",
+    "@types/uuid": "^8.3.4",
+    "babel-jest": "^27.5.1",
+    "jest": "^27.5.1",
+    "jsonwebtoken": "^9.0.1",
+    "ts-jest": "^27.1.4",
+    "typescript": "^4.6.4",
+    "uuid": "^9.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "35ff51f0afc618c5413ef9bab778f4dcf582b8ab",
+  "homepage": "https://integrationos.com"
+}
