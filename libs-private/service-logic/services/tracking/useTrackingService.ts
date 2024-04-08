@@ -25,7 +25,7 @@ export const useTrackingService = (ctx: any) => {
 
         if (!client) {
           // Do not do anything if the client is not initialized
-          return resultOk(true);
+          return resultOk(false);
         }
         
         switch (path) {
