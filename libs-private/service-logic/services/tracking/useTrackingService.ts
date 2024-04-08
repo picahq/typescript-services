@@ -2,7 +2,8 @@ import { resultOk, resultErr } from '@event-inc/utils';
 import Analytics from 'analytics-node';
 
 export const useTrackingService = (ctx: any) => {
-  const client = new Analytics(process.env.SEGMENT_WRITE_KEY);
+
+  const client = process.env.SEGMENT_WRITE_KEY && new Analytics(process.env.SEGMENT_WRITE_KEY);
 
   const makePayload = (payload: any, ip: string) => {
     const { context = {} } = payload;
@@ -21,6 +22,12 @@ export const useTrackingService = (ctx: any) => {
       const ipAddress = (ctx.meta.clientIp || '').split(',')[0].trim();
 
       try {
+
+        if (!client) {
+          // Do not do anything if the client is not initialized
+          return resultOk(true);
+        }
+        
         switch (path) {
           // If the type is identify, then we want to call the identify method on the analytics-node client
           case 'i':
