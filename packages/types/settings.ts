@@ -15,6 +15,12 @@ export interface Platform {
   };
 }
 
+export interface Feature {
+  key: string;
+  value: 'enabled' | 'disabled';
+  updatedAt: number;
+}
+
 export interface LinkSettings {
   _id?: string;
   ownership: Ownership;
@@ -23,6 +29,7 @@ export interface LinkSettings {
   updatedAt: number;
   createdDate: Date;
   updatedDate: Date;
+  features?: Feature[];
 }
 
 export interface ListLinkSettings {
@@ -39,4 +46,5 @@ export interface CreateSettingPayload {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
   };
+  features?: Feature[];
 }

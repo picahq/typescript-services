@@ -191,7 +191,7 @@ export const testConnectionModelDefinition = async (
 
   return {
     connectionModelDefinitionId,
-    success: res.data.status.state === 'success',
+    success: res.data.status.state["success"] !== undefined,
     request: request,
     testEndpointResponse: res.data,
   };

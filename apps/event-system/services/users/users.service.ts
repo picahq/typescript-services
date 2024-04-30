@@ -287,8 +287,12 @@ module.exports = {
                   'Accept-Encoding': 'UTF-8',
                 },
                 params: {
-                  client_id: process.env.GITHUB_OAUTH_CLIENT_ID,
-                  client_secret: process.env.GITHUB_OAUTH_CLIENT_SECRET,
+                  client_id: ctx.meta.isAdmin
+                    ? process.env.ADMIN_GITHUB_OAUTH_CLIENT_ID
+                    : process.env.GITHUB_OAUTH_CLIENT_ID,
+                  client_secret: ctx.meta.isAdmin
+                    ? process.env.ADMIN_GITHUB_OAUTH_CLIENT_SECRET
+                    : process.env.GITHUB_OAUTH_CLIENT_SECRET,
                   code,
                 },
                 decompress: false,

@@ -7,6 +7,12 @@ import { internalRoute } from './routes/internal';
 import { publicRoute } from './routes/public';
 const Buildable = require('@libs-private/service-logic/mixins/buildable');
 
+const adminUrls = [
+  "http://localhost:4200",
+  "https://admin-development.internal.event.dev",
+  "https://admin.internal.event.dev"
+]
+
 module.exports = {
   name: 'api',
   version: 1,
@@ -101,6 +107,9 @@ module.exports = {
               _id: decodedToken._id,
               email: decodedToken.email,
             };
+          }
+          if (adminUrls.some((url) => req.headers.origin.includes(url))) {
+            ctx.meta.isAdmin = true;
           }
         },
       },

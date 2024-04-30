@@ -111,6 +111,44 @@ export interface Platform {
   };
 }
 
+export interface Feature {
+  key: string;
+  value: 'enabled' | 'disabled';
+  updatedAt: number;
+}
+
+export interface ConnectionRecord {
+	_id: string;
+	platformVersion: string;
+	connectionDefinitionId: string;
+	name: string;
+	key: string;
+	environment: string;
+	platform: string;
+	secretsServiceId: string;
+	settings: {
+		parseWebhookBody: boolean;
+		showSecret: boolean;
+		allowCustomEvents: boolean;
+		oauth: boolean;
+	};
+	throughput: {
+		key: string;
+		limit: number;
+	};
+	createdAt: number;
+	updatedAt: number;
+	updated: boolean;
+	version: string;
+	lastModifiedBy: string;
+	deleted: boolean;
+	changeLog: Record<string, any>; // You can replace 'any' with a more specific type if needed
+	tags: string[];
+	active: boolean;
+	deprecated: boolean;
+}
+
+
 export interface EmbedTokenRecord {
   linkSettings: {
     connectedPlatforms: Platform[];
@@ -123,6 +161,15 @@ export interface EmbedTokenRecord {
   updatedAt?: number;
   expiresAt?: number;
   environment: string;
+  features?: Feature[];
+  sessionId: string;
+	_id?: string;
+	formData?: object;
+	response?: {
+        isConnected: boolean;
+        message?: string;
+        connection?: ConnectionRecord;
+    }
 }
 
 export interface LinkSettings {
@@ -133,4 +180,5 @@ export interface LinkSettings {
   updatedAt: number;
   createdDate: Date;
   updatedDate: Date;
+  features?: Feature[];
 }
