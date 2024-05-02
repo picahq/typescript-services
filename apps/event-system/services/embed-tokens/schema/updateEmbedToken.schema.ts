@@ -16,6 +16,10 @@ export const updateEmbedTokenSchema = {
         type: 'string',
         optional: true,
       },
+      connection: {
+        type: 'object',
+        optional: true,
+      },
     },
     optional: true,
   },

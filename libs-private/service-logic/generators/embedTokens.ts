@@ -10,6 +10,7 @@ export const generateEmbedTokensRecord = ({
   ttl,
   linkSettings,
   environment,
+  features,
 }: EmbedTokensPayload): EmbedTokenRecord => {
   return {
     label,
@@ -20,5 +21,6 @@ export const generateEmbedTokensRecord = ({
     expiresAt: new Date().getTime() + ttl,
     environment,
     sessionId: generateId('session_id'),
+    features,
   };
 };

@@ -8,7 +8,11 @@ import {
 import { Services } from '@event-inc/private::types';
 import { Context } from 'moleculer';
 import { useGenericCRUDService } from '../genericCRUD';
-import { Platform, LinkSettings as Settings } from '@event-inc/types/settings';
+import {
+  Platform,
+  LinkSettings as Settings,
+  Feature,
+} from '@event-inc/types/settings';
 import { BResult } from '@event-inc/types';
 import { generateSettingRecord } from '@libs-private/service-logic/generators/settings/linkSettings';
 import { generateMeta } from '../../../utils/meta';
@@ -43,12 +47,14 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
     async createOrUpdate({
       platform,
       configuration,
+      features,
     }: {
-      platform: Platform;
+      platform?: Platform;
       configuration?: {
         CLIENT_ID: string;
         CLIENT_SECRET: string;
       };
+      features?: Feature[];
     }): Promise<BResult<boolean, 'service', unknown>> {
       try {
         const settingsRecord = (await _list()).unwrap().rows[0] as Settings;
@@ -70,25 +76,28 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
         }
 
         if (settingsRecord) {
-          const platformIndex = settingsRecord.connectedPlatforms.findIndex(
-            (connectedPlatform) =>
-              connectedPlatform.connectionDefinitionId ===
-              platform.connectionDefinitionId
-          );
+          if (platform) {
+            const platformIndex = settingsRecord.connectedPlatforms.findIndex(
+              (connectedPlatform) =>
+                connectedPlatform.connectionDefinitionId ===
+                platform.connectionDefinitionId
+            );
 
-          if (platformIndex !== -1) {
-            settingsRecord.connectedPlatforms[platformIndex] = {
-              ...settingsRecord.connectedPlatforms[platformIndex],
-              ...platform,
-            };
-          } else {
-            settingsRecord.connectedPlatforms.push(platform);
+            if (platformIndex !== -1) {
+              settingsRecord.connectedPlatforms[platformIndex] = {
+                ...settingsRecord.connectedPlatforms[platformIndex],
+                ...platform,
+              };
+            } else {
+              settingsRecord.connectedPlatforms.push(platform);
+            }
           }
 
           await updateById(settingsRecord._id, {
             connectedPlatforms: settingsRecord.connectedPlatforms,
             updatedAt: new Date().getTime(),
             updatedDate: new Date().toISOString(),
+            features: features?.length ? features : settingsRecord.features,
           });
 
           return resultOk(true);
@@ -97,6 +106,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
         const setting = generateSettingRecord({
           ownership,
           platform,
+          features: [],
         });
 
         await _create<Settings>('st', setting);

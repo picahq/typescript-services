@@ -71,6 +71,7 @@ export const createEventLinkTokenApi = async (
       environment: secret.startsWith('sk_test') ? 'test' : 'live',
       expiresAt: new Date().getTime() + 5 * 1000 * 60,
       sessionId: generateId('session_id'),
+      features: settings?.data?.features,
     };
 
     const token = await axios.post<EmbedTokenRecord>(

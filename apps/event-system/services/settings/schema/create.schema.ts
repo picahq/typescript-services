@@ -4,6 +4,7 @@ export const createSettingsSchema = {
   ...createSchema,
   platform: {
     type: 'object',
+    optional: true,
     props: {
       connectionDefinitionId: {
         type: 'string',
@@ -36,6 +37,25 @@ export const createSettingsSchema = {
       },
       CLIENT_SECRET: {
         type: 'string',
+      },
+    },
+  },
+  features: {
+    type: 'array',
+    optional: true,
+    items: {
+      type: 'object',
+      props: {
+        key: {
+          type: 'string',
+        },
+        value: {
+          type: 'string',
+          enum: ['enabled', 'disabled'],
+        },
+        updatedAt: {
+          type: 'number',
+        },
       },
     },
   },

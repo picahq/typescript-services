@@ -4,12 +4,9 @@ export interface ConnectionRecord {
   connectionDefinitionId: string;
   name: string;
   key: string;
-  group: string;
   environment: string;
   platform: string;
   secretsServiceId: string;
-  eventAccessId: string;
-  accessKey: string;
   settings: {
     parseWebhookBody: boolean;
     showSecret: boolean;
@@ -19,13 +16,6 @@ export interface ConnectionRecord {
   throughput: {
     key: string;
     limit: number;
-  };
-  ownership: {
-    buildableId: string;
-    clientId: string;
-    organizationId: string;
-    projectId: string;
-    userId: string;
   };
   createdAt: number;
   updatedAt: number;

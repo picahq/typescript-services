@@ -27,6 +27,7 @@ import { useEventAccessService } from '../events/useEventAccessService';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { generateEmbedTokensRecord } from '@libs-private/service-logic/generators/embedTokens';
+import { generateId } from '@integrationos/rust-utils';
 
 const GET_EVENT_ACCESS_RECORD_URL = process.env.CONNECTIONS_API_BASE_URL + 'v1/event-access';
 const CREATE_CONNECTION_URL =  process.env.CONNECTIONS_API_BASE_URL + 'v1/connections';
@@ -363,6 +364,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         environment: headers['x-integrationos-secret'].startsWith('sk_test')
           ? 'test'
           : 'live',
+        features: settings?.features,
+        sessionId: generateId('session_id'),
       };
 
       const embedToken = generateEmbedTokensRecord(tokenPayload);
@@ -476,6 +479,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         label: linkToken?.label,
         ttl: 5 * 60 * 1000,
         environment: 'test',
+        features: settings?.features,
+        sessionId: generateId('session_id'),
       };
 
       const embedToken = generateEmbedTokensRecord(tokenPayload);

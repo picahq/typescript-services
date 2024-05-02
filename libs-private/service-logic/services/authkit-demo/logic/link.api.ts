@@ -82,6 +82,7 @@ export const createEventLinkTokenApi = async (
     environment: 'live',
     expiresAt: new Date().getTime() + 5 * 1000 * 60,
     sessionId: generateId('session_id'),
+    features: data?.features
   };
 
   const token = await makeHttpNetworkCall<EmbedTokenRecord>({

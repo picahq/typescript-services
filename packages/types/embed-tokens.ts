@@ -1,3 +1,4 @@
+import { ConnectionRecord } from "./connection";
 export interface Platform {
   type: string;
   title: string;
@@ -12,6 +13,12 @@ export interface Platform {
   };
 }
 
+interface Feature {
+  key: string;
+  value: 'enabled' | 'disabled';
+  updatedAt: number;
+}
+
 export interface EmbedTokensPayload {
   linkSettings: {
     connectedPlatforms: Platform[];
@@ -21,7 +28,8 @@ export interface EmbedTokensPayload {
   label: string;
   environment: string;
   ttl: number;
-  sessionId?: string;
+  sessionId: string;
+  features?: Feature[];
 }
 
 export interface EmbedTokenRecord {
@@ -29,6 +37,7 @@ export interface EmbedTokenRecord {
     connectedPlatforms: Platform[];
     eventIncToken: string;
   };
+  features?: Feature[];
   label: string;
   group: string;
   createdAt: number;
@@ -36,12 +45,13 @@ export interface EmbedTokenRecord {
   updatedAt?: number;
   expiresAt?: number;
   environment: string;
-  sessionId?: string;
+  sessionId: string;
   _id?: string;
   formData?: object;
   response?: {
     isConnected: boolean;
     message?: string;
+    connection?: ConnectionRecord;
   };
 }
 
@@ -51,5 +61,6 @@ export interface UpdateEmbedTokenPayload {
   response?: {
     isConnected: boolean;
     message?: string;
+    connection?: ConnectionRecord;
   };
 }
