@@ -225,11 +225,20 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           identity
         );
 
+        let secret = headers['x-integrationos-secret'];
+
+        if (secret && secret !== 'redacted') {
+          secret = headers['x-integrationos-secret'];
+        }
+        else {
+          secret = recordsList?.rows?.[0]?.accessKey;
+        }
+
         const connection = await makeHttpNetworkCall<ConnectionRecord>({
           url: `${CREATE_OAUTH_CONNECTION_URL}/${type}`,
           method: 'POST',
           headers: {
-            'x-integrationos-secret': recordsList?.rows?.[0]?.accessKey,
+            'x-integrationos-secret': secret,
           },
           data: {
             __isEngineeringAccount__:
