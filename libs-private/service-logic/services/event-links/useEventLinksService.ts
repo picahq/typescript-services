@@ -229,9 +229,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           url: `${CREATE_OAUTH_CONNECTION_URL}/${type}`,
           method: 'POST',
           headers: {
-            'x-integrationos-secret':
-              headers['x-integrationos-secret'] ||
-              recordsList?.rows?.[0]?.accessKey,
+            'x-integrationos-secret': recordsList?.rows?.[0]?.accessKey,
           },
           data: {
             __isEngineeringAccount__:
