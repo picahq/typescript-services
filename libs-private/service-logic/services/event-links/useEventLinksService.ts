@@ -227,10 +227,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
 
         let secret = headers['x-integrationos-secret'];
 
-        if (secret && secret !== 'redacted') {
-          secret = headers['x-integrationos-secret'];
-        }
-        else {
+        if (!secret || secret === 'redacted') {
           secret = recordsList?.rows?.[0]?.accessKey;
         }
 
@@ -241,8 +238,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
             'x-integrationos-secret': secret,
           },
           data: {
-            __isEngineeringAccount__:
-              link?.usageSource === 'user-dashboard' ? true : false,
             clientId,
             payload: {
               code,
