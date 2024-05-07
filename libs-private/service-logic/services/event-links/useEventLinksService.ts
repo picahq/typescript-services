@@ -241,8 +241,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
             'x-integrationos-secret': secret,
           },
           data: {
-            __isEngineeringAccount__:
-              link?.usageSource === 'user-dashboard' ? true : false,
+            // __isEngineeringAccount__:
+            //   link?.usageSource === 'user-dashboard' ? true : false,
             clientId,
             payload: {
               code,
