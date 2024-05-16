@@ -23,8 +23,8 @@ type ENDPOINT_TYPES = {
 const RUST_INTERNAL_API_ENDPOINTS = {
   GET_CONNECTION_MODEL_DEFINITIONS: {
     localhost: 'http://localhost:3005/v1/connection-model-definitions',
-    development: 'http://event-admin-api/v1/connection-model-definitions',
-    production: 'http://event-admin-api/v1/connection-model-definitions',
+    development: 'http://event-connections-api/v1/connection-model-definitions',
+    production: 'http://event-connections-api/v1/connection-model-definitions',
   },
   TEST_CONNECTION_MODEL_DEFINITION: {
     localhost: 'http://localhost:3005/v1/connection-model-definitions/test',
