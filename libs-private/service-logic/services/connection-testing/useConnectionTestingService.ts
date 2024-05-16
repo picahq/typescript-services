@@ -1,10 +1,11 @@
+import('dotenv/config');
+
 import { Context } from 'moleculer';
 import jsonpath from 'jsonpath';
 import { ListResponse, Ownership } from '@libs-private/data-models';
 import { BResult } from '@event-inc/types/results';
 import {
   matchResultAndHandleHttpError,
-  resultErr,
   resultOk,
 } from '@event-inc/utils/result';
 import {
@@ -23,15 +24,13 @@ type ENDPOINT_TYPES = {
 const RUST_INTERNAL_API_ENDPOINTS = {
   GET_CONNECTION_MODEL_DEFINITIONS: {
     localhost: 'http://localhost:3005/v1/connection-model-definitions',
-    development: 'http://event-admin-api/v1/connection-model-definitions',
-    production: 'http://event-admin-api/v1/connection-model-definitions',
+    development: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
+    production: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
   },
   TEST_CONNECTION_MODEL_DEFINITION: {
     localhost: 'http://localhost:3005/v1/connection-model-definitions/test',
-    development:
-      'http://event-connections-api/v1/connection-model-definitions/test',
-    production:
-      'http://event-connections-api/v1/connection-model-definitions/test',
+    development: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`,
+    production: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`,
   },
 };
 
