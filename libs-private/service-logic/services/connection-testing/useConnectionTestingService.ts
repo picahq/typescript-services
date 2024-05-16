@@ -22,7 +22,7 @@ type ENDPOINT_TYPES = {
 
 const RUST_INTERNAL_API_ENDPOINTS = {
   GET_CONNECTION_MODEL_DEFINITIONS: {
-    localhost: 'http://localhost:3010/v1/connection-model-definitions',
+    localhost: 'http://localhost:3005/v1/connection-model-definitions',
     development: 'http://event-admin-api/v1/connection-model-definitions',
     production: 'http://event-admin-api/v1/connection-model-definitions',
   },
@@ -144,11 +144,11 @@ export const testConnectionModelDefinition = async (
     pathParams: Record<string, string> | null;
     queryParams: Record<string, string> | null;
   } = {
-    headers: {},
-    body: {},
-    pathParams: {},
-    queryParams: {},
-  }
+      headers: {},
+      body: {},
+      pathParams: {},
+      queryParams: {},
+    }
 ) => {
   const convertValuesToStrings = (
     obj: Record<string, any> | null
@@ -260,7 +260,7 @@ export const useConnectionModelTestingService = (
         } else {
           throw new Error(
             'Failed to get createId from response body: ' +
-              JSON.stringify(createResponse)
+            JSON.stringify(createResponse)
           );
         }
 
@@ -400,7 +400,7 @@ export const useConnectionModelTestingService = (
           let templatedDeleteValue = modelConfig.customDeleteValue.replace(
             'CREATE_ID',
             createId ||
-              deleteDef.samples.pathParams[modelConfig.deleteIdFieldName]
+            deleteDef.samples.pathParams[modelConfig.deleteIdFieldName]
           );
 
           try {
@@ -408,7 +408,7 @@ export const useConnectionModelTestingService = (
           } catch (e) {
             throw new Error(
               'Failed to parse customDeleteValue as JSON: ' +
-                templatedDeleteValue
+              templatedDeleteValue
             );
           }
 
@@ -422,7 +422,7 @@ export const useConnectionModelTestingService = (
             deleteDef,
             modelConfig.deleteIdFieldName,
             createId ||
-              deleteDef.samples.pathParams[modelConfig.deleteIdFieldName]
+            deleteDef.samples.pathParams[modelConfig.deleteIdFieldName]
           );
         }
 
