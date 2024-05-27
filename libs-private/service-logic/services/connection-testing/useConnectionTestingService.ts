@@ -23,12 +23,12 @@ type ENDPOINT_TYPES = {
 
 const RUST_INTERNAL_API_ENDPOINTS = {
   GET_CONNECTION_MODEL_DEFINITIONS: {
-    localhost: 'http://localhost:3005/v1/connection-model-definitions',
+    localhost: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
     development: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
     production: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
   },
   TEST_CONNECTION_MODEL_DEFINITION: {
-    localhost: 'http://localhost:3005/v1/connection-model-definitions/test',
+    localhost: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`,
     development: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`,
     production: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`,
   },
