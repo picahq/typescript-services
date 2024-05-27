@@ -90,14 +90,14 @@ const ACCESS_KEY_PREFIX_LENGTH = 7;
 
 const RUST_INTERNAL_API_ENDPOINTS = {
   CREATE_EVENT_ACCESS_RECORD: {
-    localhost: 'http://localhost:3005/v1/public/event-access/default',
-    development: 'http://event-connections-api/v1/public/event-access/default',
-    production: 'http://event-connections-api/v1/public/event-access/default',
+    localhost: `${process.env.CONNECTIONS_API_BASE_URL}v1/public/event-access/default`,
+    development: `${process.env.CONNECTIONS_API_BASE_URL}v1/public/event-access/default`,
+    production: `${process.env.CONNECTIONS_API_BASE_URL}v1/public/event-access/default`,
   },
   GET_EVENT_ACCESS_RECORD: {
-    localhost: 'http://localhost:3005/v1/event-access',
-    development: 'http://event-connections-api/v1/event-access',
-    production: 'http://event-connections-api/v1/event-access',
+    localhost: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`,
+    development: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`,
+    production: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`,
   },
 };
 
@@ -218,14 +218,14 @@ module.exports = {
               ...(state ? { state } : {}),
               ...(state
                 ? {
-                    stateHistory: [
-                      {
-                        state,
-                        createdAt: Date.now(),
-                        createdDate: new Date(),
-                      },
-                    ].concat(get(user, 'stateHistory') || []),
-                  }
+                  stateHistory: [
+                    {
+                      state,
+                      createdAt: Date.now(),
+                      createdDate: new Date(),
+                    },
+                  ].concat(get(user, 'stateHistory') || []),
+                }
                 : {}),
             },
             { meta: ctx.meta }
@@ -406,9 +406,9 @@ module.exports = {
 
             const email = Array.isArray(emails)
               ? get(
-                  emails.find((v) => get(v, 'primary')),
-                  'email'
-                )
+                emails.find((v) => get(v, 'primary')),
+                'email'
+              )
               : null;
 
             const username = get(user, 'login');
@@ -743,28 +743,28 @@ module.exports = {
         );
         const connectedAccounts = connectedAccount
           ? //ensure old connectedAccount data is updated
-            (get(_user, 'connectedAccounts') || []).map((i: any) =>
-              i.email === email && i.provider === provider
-                ? {
-                    ...i,
-                    name: `${firstName} ${lastName}`.trim(),
-                    email,
-                    provider,
-                    username,
-                    profileLink,
-                  }
-                : i
-            )
-          : [
-              {
+          (get(_user, 'connectedAccounts') || []).map((i: any) =>
+            i.email === email && i.provider === provider
+              ? {
+                ...i,
                 name: `${firstName} ${lastName}`.trim(),
                 email,
                 provider,
                 username,
                 profileLink,
-                connectedAt: Date.now(),
-              },
-            ].concat(get(_user, 'connectedAccounts') || []);
+              }
+              : i
+          )
+          : [
+            {
+              name: `${firstName} ${lastName}`.trim(),
+              email,
+              provider,
+              username,
+              profileLink,
+              connectedAt: Date.now(),
+            },
+          ].concat(get(_user, 'connectedAccounts') || []);
 
         return await ctx.broker.call('v3.users.update', {
           id: _user._id,
@@ -773,9 +773,8 @@ module.exports = {
           username: _user.username ? _user.username : username,
           userKey: _user.userKey
             ? _user.userKey
-            : `${
-                username || email.substring(0, email.indexOf('@'))
-              }${randomCode(6)}`,
+            : `${username || email.substring(0, email.indexOf('@'))
+            }${randomCode(6)}`,
           [`providers.${provider}`]: user,
           connectedAccounts,
           profile: {
@@ -852,9 +851,8 @@ module.exports = {
           _user = await ctx.broker.call('v3.users.create', {
             email,
             username,
-            userKey: `${
-              username || email.substring(0, email.indexOf('@'))
-            }${randomCode(6)}`,
+            userKey: `${username || email.substring(0, email.indexOf('@'))
+              }${randomCode(6)}`,
             providers: {
               [provider]: user,
             },
