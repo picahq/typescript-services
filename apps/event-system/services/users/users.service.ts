@@ -83,22 +83,11 @@ const AXIOS_REQUEST_ERROR =
 const AXIOS_REQUEST_SETUP_ERROR =
   'Axios Error - Something happened in setting up the request that triggered an Error';
 
-// required to call v1.clients
-const SECRET = process.env.CORE_USER_SECRET;
-
 const ACCESS_KEY_PREFIX_LENGTH = 7;
 
 const RUST_INTERNAL_API_ENDPOINTS = {
-  CREATE_EVENT_ACCESS_RECORD: {
-    localhost: `${process.env.CONNECTIONS_API_BASE_URL}v1/public/event-access/default`,
-    development: `${process.env.CONNECTIONS_API_BASE_URL}v1/public/event-access/default`,
-    production: `${process.env.CONNECTIONS_API_BASE_URL}v1/public/event-access/default`,
-  },
-  GET_EVENT_ACCESS_RECORD: {
-    localhost: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`,
-    development: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`,
-    production: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`,
-  },
+  CREATE_EVENT_ACCESS_RECORD: `${process.env.CONNECTIONS_API_BASE_URL}v1/public/event-access/default`,
+  GET_EVENT_ACCESS_RECORD: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`
 };
 
 const generate_default_event_access_record = (
@@ -886,7 +875,6 @@ module.exports = {
 
           const client = await ctx.broker.call('v1.clients.create', {
             user: _user,
-            secret: SECRET,
             name: email,
           });
 
@@ -907,9 +895,7 @@ module.exports = {
           const createTestKey = axios({
             method: 'post',
             // @ts-ignore
-            url: RUST_INTERNAL_API_ENDPOINTS.CREATE_EVENT_ACCESS_RECORD[
-              process.env.NODE_ENV
-            ],
+            url: RUST_INTERNAL_API_ENDPOINTS.CREATE_EVENT_ACCESS_RECORD,
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
@@ -924,9 +910,7 @@ module.exports = {
           const createLiveKey = axios({
             method: 'post',
             // @ts-ignore
-            url: RUST_INTERNAL_API_ENDPOINTS.CREATE_EVENT_ACCESS_RECORD[
-              process.env.NODE_ENV
-            ],
+            url: RUST_INTERNAL_API_ENDPOINTS.CREATE_EVENT_ACCESS_RECORD,
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
