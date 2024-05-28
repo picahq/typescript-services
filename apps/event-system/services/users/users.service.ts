@@ -894,7 +894,6 @@ module.exports = {
           // Create default API keys
           const createTestKey = axios({
             method: 'post',
-            // @ts-ignore
             url: RUST_INTERNAL_API_ENDPOINTS.CREATE_EVENT_ACCESS_RECORD,
             headers: {
               'Content-Type': 'application/json',
@@ -909,7 +908,6 @@ module.exports = {
 
           const createLiveKey = axios({
             method: 'post',
-            // @ts-ignore
             url: RUST_INTERNAL_API_ENDPOINTS.CREATE_EVENT_ACCESS_RECORD,
             headers: {
               'Content-Type': 'application/json',
