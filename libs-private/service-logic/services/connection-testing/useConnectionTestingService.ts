@@ -22,16 +22,8 @@ type ENDPOINT_TYPES = {
 };
 
 const RUST_INTERNAL_API_ENDPOINTS = {
-  GET_CONNECTION_MODEL_DEFINITIONS: {
-    localhost: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
-    development: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
-    production: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
-  },
-  TEST_CONNECTION_MODEL_DEFINITION: {
-    localhost: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`,
-    development: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`,
-    production: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`,
-  },
+  GET_CONNECTION_MODEL_DEFINITIONS: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions`,
+  TEST_CONNECTION_MODEL_DEFINITION: `${process.env.CONNECTIONS_API_BASE_URL}v1/connection-model-definitions/test`
 };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -105,9 +97,7 @@ export const getDefaultConnectionModelDefinitions = async (
   connectionDefinitionId: string,
   modelName: string
 ) => {
-  const url = RUST_INTERNAL_API_ENDPOINTS.GET_CONNECTION_MODEL_DEFINITIONS[
-    process.env.NODE_ENV as keyof ENDPOINT_TYPES
-  ] as string;
+  const url = RUST_INTERNAL_API_ENDPOINTS.GET_CONNECTION_MODEL_DEFINITIONS;
   const definitionsResult = await makeHttpNetworkCall<ListResponse<any>>({
     url,
     method: 'GET',
@@ -165,9 +155,7 @@ export const testConnectionModelDefinition = async (
   const pathParams = convertValuesToStrings(request.pathParams);
   const queryParams = convertValuesToStrings(request.queryParams);
 
-  const url = RUST_INTERNAL_API_ENDPOINTS.TEST_CONNECTION_MODEL_DEFINITION[
-    process.env.NODE_ENV as keyof ENDPOINT_TYPES
-  ] as string;
+  const url = RUST_INTERNAL_API_ENDPOINTS.TEST_CONNECTION_MODEL_DEFINITION;
   const testResult = await makeHttpNetworkCall<any>({
     url: `${url}/${connectionModelDefinitionId}`,
     method: 'POST',
