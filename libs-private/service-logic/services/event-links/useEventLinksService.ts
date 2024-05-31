@@ -30,7 +30,7 @@ import { generateEmbedTokensRecord } from '@libs-private/service-logic/generator
 import { generateId } from '@integrationos/rust-utils';
 
 const GET_EVENT_ACCESS_RECORD_URL = process.env.CONNECTIONS_API_BASE_URL + 'v1/event-access';
-const CREATE_CONNECTION_URL =  process.env.CONNECTIONS_API_BASE_URL + 'v1/connections';
+const CREATE_CONNECTION_URL = process.env.CONNECTIONS_API_BASE_URL + 'v1/connections';
 const CREATE_OAUTH_CONNECTION_URL = process.env.CONNECTIONS_API_BASE_URL + 'v1/oauth';
 const LIST_CONNECTION_DEFINITIONS_URL = process.env.CONNECTIONS_API_BASE_URL + 'v1/public/connection-definitions';
 
@@ -137,10 +137,10 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
             authFormData,
             group: authFormData['NAME']
               ? `${_.replace(
-                  authFormData['NAME'],
-                  /[^a-zA-Z0-9_]/g,
-                  '-'
-                ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
+                authFormData['NAME'],
+                /[^a-zA-Z0-9_]/g,
+                '-'
+              ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
               : link?.group,
           },
         });
@@ -173,6 +173,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       redirectUri,
       type,
       formData,
+      additionalData,
     }: CreateOauthEmbedConnectionPayload): Promise<
       BResult<ConnectionRecord, 'service', unknown>
     > {
@@ -209,7 +210,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       const contextMetadata = ctx.meta as any;
       const headers = contextMetadata.request.headers;
 
-
       try {
         const { listAccessKeys } = useEventAccessService(ctx, link.ownership);
         const eventAccessRecords = await listAccessKeys({
@@ -239,22 +239,23 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           },
           data: {
             __isEngineeringAccount__:
-            link?.usageSource === 'user-dashboard' ? true : false,
+              link?.usageSource === 'user-dashboard' ? true : false,
             clientId,
             payload: {
               code,
               redirectUri,
               formData,
+              additionalData
             },
             type,
             connectionDefinitionId,
             label: formData?.['NAME'] ?? link?.label,
             group: formData?.['NAME']
               ? `${_.replace(
-                  formData?.['NAME'] as string,
-                  /[^a-zA-Z0-9_]/g,
-                  '-'
-                ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
+                formData?.['NAME'] as string,
+                /[^a-zA-Z0-9_]/g,
+                '-'
+              ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
               : link?.group,
           },
         });
@@ -291,7 +292,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       const settings = settingsResult.unwrap();
 
       // Get the event access records
-      const eventAccessRecords = await makeHttpNetworkCall<EventAccessRecords>({  
+      const eventAccessRecords = await makeHttpNetworkCall<EventAccessRecords>({
         url: GET_EVENT_ACCESS_RECORD_URL,
         method: 'GET',
         headers: {

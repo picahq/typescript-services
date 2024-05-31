@@ -46,4 +46,5 @@ export interface CreateOauthEmbedConnectionPayload {
   redirectUri: string;
   clientId: string;
   formData?: { [K: string]: unknown };
+  additionalData?: { [K: string]: unknown };
 }
