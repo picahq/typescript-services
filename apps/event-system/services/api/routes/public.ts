@@ -24,11 +24,7 @@ export const publicRoute = () => ({
     'v1.embed-tokens.public.get',
     'v1.embed-tokens.public.update',
 
-    'v1.connection-testing.public.testConnectionModel',
-
-    // Platforms OAuth
-    'v1.platforms-oauth.public.xeroInit',
-    'v1.platforms-oauth.public.xeroRefresh',
+    'v1.connection-testing.public.testConnectionModel'
   ],
 
   aliases: {
@@ -53,11 +49,6 @@ export const publicRoute = () => ({
 
     'POST v1/embed-tokens/get': 'v1.embed-tokens.public.get',
     'POST v1/embed-tokens/update': 'v1.embed-tokens.public.update',
-
-    // Platforms OAuth
-    'POST v1/platforms-oauth/xero/init': 'v1.platforms-oauth.public.xeroInit',
-    'POST v1/platforms-oauth/xero/refresh':
-      'v1.platforms-oauth.public.xeroRefresh',
   },
 
   cors: {
