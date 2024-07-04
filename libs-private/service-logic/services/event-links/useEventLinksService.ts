@@ -463,14 +463,14 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       const { data: activeConnectionDefinitionsData } =
         matchResultAndHandleHttpError(connectionDefinitions, identity);
 
-      // Remove the platforms from the settings.connectedPlatforms that are not active
+      // Remove the platforms from the settings.connectedPlatforms that are not active and also remove the platforms that have environment as live
       const connectedPlatforms = settings?.connectedPlatforms?.filter(
         (platform) => {
           return (
             activeConnectionDefinitionsData?.rows?.find(
               (definition) =>
                 definition?._id === platform?.connectionDefinitionId
-            ) && platform?.active
+            ) && platform?.active && platform?.environment !== 'live'
           );
         }
       );

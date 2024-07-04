@@ -37,14 +37,12 @@ export const createEventLinkTokenApi = async (
         ? 'https://development-api.integrationos.com/v1/public/connection-definitions'
         : 'https://api.integrationos.com/v1/public/connection-definitions';
 
-    const connectionDefinitionHeaders = {
-      'x-integrationos-secret': secret,
-    };
 
     const connectionDefinitions = await axios.get<ConnectionDefinitions>(
-      `${connectionDefinitionUrl}?limit=100&skip=0`,
-      { headers: connectionDefinitionHeaders }
+      `${connectionDefinitionUrl}?limit=100&skip=0`
     );
+
+    const isLiveSecret = secret.includes('sk_live');
 
     const activeConnectionDefinitionsData =
       connectionDefinitions?.data?.rows?.filter(
@@ -61,9 +59,16 @@ export const createEventLinkTokenApi = async (
       }
     );
 
+    const connectedPlatformsFiltered = connectedPlatforms?.filter(
+      (platform) =>
+        isLiveSecret
+          ? platform?.environment === 'live'
+          : platform?.environment === 'test' || !platform?.environment
+    );
+
     const tokenPayload = {
       linkSettings: {
-        connectedPlatforms: connectedPlatforms ?? [],
+        connectedPlatforms: connectedPlatformsFiltered ?? [],
         eventIncToken: link?.data?.token,
       },
       group: link?.data?.group,
