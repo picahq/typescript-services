@@ -44,15 +44,12 @@ export const createEventLinkTokenApi = async (
       ? 'https://development-api.integrationos.com/v1/public/connection-definitions'
       : 'https://api.integrationos.com/v1/public/connection-definitions';
 
-  const connectionDefinitionHeaders = {
-    'x-integrationos-secret': secret,
-  };
+  const isLiveSecret = secret.includes('sk_live');
 
   const connectionDefinitions =
     await makeHttpNetworkCall<ConnectionDefinitions>({
       method: 'GET',
       url: `${connectionDefinitionUrl}?limit=100&skip=0`,
-      headers: connectionDefinitionHeaders,
     });
 
   const { data: connectionDefinitionsData } = matchResultAndHandleHttpError(
@@ -72,9 +69,17 @@ export const createEventLinkTokenApi = async (
     );
   });
 
+  // Filter out the connectedPlatforms based on the secret. If the secret is live, only return the live platforms otherwise return all the platforms
+  const connectedPlatformsFiltered = connectedPlatforms?.filter(
+    (platform) =>
+      isLiveSecret
+        ? platform?.environment === 'live'
+        : platform?.environment === 'test' || !platform?.environment
+  );
+
   const tokenPayload = {
     linkSettings: {
-      connectedPlatforms: connectedPlatforms ?? [],
+      connectedPlatforms: connectedPlatformsFiltered ?? [],
       eventIncToken: linkData?.token,
     },
     group: linkData?.group,

@@ -109,6 +109,7 @@ export interface Platform {
     clientId: string;
     clientSecretDisplay: string;
   };
+  environment?: 'test' | 'live';
 }
 
 export interface Feature {
