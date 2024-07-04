@@ -22,6 +22,10 @@ export const createSettingsSchema = {
       image: {
         type: 'string',
       },
+      environment: {
+        type: 'string',
+        enum: ['test', 'live'],
+      },
       activatedAt: {
         type: 'number',
         default: new Date().getTime(),

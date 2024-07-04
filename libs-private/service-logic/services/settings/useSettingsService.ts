@@ -80,7 +80,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
             const platformIndex = settingsRecord.connectedPlatforms.findIndex(
               (connectedPlatform) =>
                 connectedPlatform.connectionDefinitionId ===
-                platform.connectionDefinitionId
+                platform.connectionDefinitionId && (connectedPlatform?.environment || "test") === platform?.environment
             );
 
             if (platformIndex !== -1) {
