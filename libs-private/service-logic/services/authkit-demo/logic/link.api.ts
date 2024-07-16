@@ -26,12 +26,15 @@ export const createEventLinkTokenApi = async (
 
   const { data } = matchResultAndHandleHttpError(settings, identity);
 
+  const isLiveSecret = secret.includes('sk_live');
+
   const link = await makeHttpNetworkCall<EventLink>({
     method: 'POST',
     url: `${url}/v1/event-links/create`,
     headers,
     data: {
       ...payload,
+      environment: isLiveSecret ? 'live' : 'test',
       usageSource: 'demo',
     },
   });
@@ -43,8 +46,6 @@ export const createEventLinkTokenApi = async (
     : url.includes('development')
       ? 'https://development-api.integrationos.com/v1/public/connection-definitions'
       : 'https://api.integrationos.com/v1/public/connection-definitions';
-
-  const isLiveSecret = secret.includes('sk_live');
 
   const connectionDefinitions =
     await makeHttpNetworkCall<ConnectionDefinitions>({
@@ -84,7 +85,7 @@ export const createEventLinkTokenApi = async (
     },
     group: linkData?.group,
     label: linkData?.label,
-    environment: 'live',
+    environment: isLiveSecret ? 'live' : 'test',
     expiresAt: new Date().getTime() + 5 * 1000 * 60,
     sessionId: generateId('session_id'),
     features: data?.features
