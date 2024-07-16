@@ -47,7 +47,6 @@ export const createEventLinkTokenApi = async (
       ? 'https://development-api.integrationos.com/v1/public/connection-definitions'
       : 'https://api.integrationos.com/v1/public/connection-definitions';
 
-
   const connectionDefinitions =
     await makeHttpNetworkCall<ConnectionDefinitions>({
       method: 'GET',
