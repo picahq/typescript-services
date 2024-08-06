@@ -41,16 +41,5 @@ export interface ClientRecord {
 }
 
 export interface ClientSettings {
-  restrictions: {
-    queues: {
-      development: number;
-      sandbox: number;
-      main: number;
-    };
-    workersPerQueue: {
-      development: number;
-      sandbox: number;
-      main: number;
-    };
-  };
+  restrictions: {};
 }
