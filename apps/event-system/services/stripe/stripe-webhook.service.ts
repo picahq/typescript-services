@@ -1,4 +1,4 @@
-import { Service, ServiceSchema } from 'moleculer';
+import { ServiceSchema } from 'moleculer';
 import Stripe from 'stripe';
 import { resultErr, resultOk } from '@event-inc/utils';
 
@@ -39,23 +39,20 @@ export default {
                   (subscriptionUpdated as any)?.plan?.id ===
                   process.env.STRIPE_GROWTH_PLAN_PRICE_ID
                     ? 'sub::growth'
-                    : process.env.STRIPE_RIDICULOUSLY_CHEAP_PRICE_ID
+                    : (subscriptionUpdated as any)?.plan?.id ===
+                      process.env.STRIPE_RIDICULOUSLY_CHEAP_PRICE_ID
                     ? 'sub::ridiculous'
                     : 'sub::free',
               },
             };
 
-            const updateClient = await ctx.broker.call(
-              'v1.clients.getByCustomerId',
+            const updatedClient = await ctx.broker.call(
+              'v1.clients.updateBillingByCustomerId',
               {
                 customerId: subscriptionUpdated?.customer,
+                billing,
               }
             );
-
-            const updatedClient = await ctx.broker.call('v1.clients.update', {
-              id: updateClient?._id,
-              billing,
-            });
 
             await ctx.broker.call('v1.tracking.public.track', {
               path: 't',
@@ -80,9 +77,23 @@ export default {
               ],
             });
 
-            const client = await ctx.broker.call('v1.clients.getByCustomerId', {
-              customerId: subscriptionDeleted?.customer,
-            });
+            const updatedBilling = {
+              provider: 'stripe',
+              customerId: subscriptionCreated?.customer,
+              subscription: {
+                id: subscriptionCreated?.id,
+                endDate: subscriptionCreated?.current_period_end,
+                key: 'sub::free',
+              },
+            };
+
+            const client = await ctx.broker.call(
+              'v1.clients.updateBillingByCustomerId',
+              {
+                customerId: subscriptionCreated?.customer,
+                billing: updatedBilling,
+              }
+            );
 
             await ctx.broker.call('v1.tracking.public.track', {
               path: 't',

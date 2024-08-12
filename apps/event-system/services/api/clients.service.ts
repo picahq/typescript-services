@@ -178,7 +178,38 @@ module.exports = {
         return client;
       },
     },
-    
+
+    updateBillingByCustomerId: {
+      params: {
+        customerId: 'string',
+        billing: { type: 'object' },
+      },
+
+      async handler(ctx: any) {
+
+        const client = await this.adapter.findOne({
+          'billing.customerId': ctx.params.customerId,
+        });
+
+        const updatedDoc = await this.adapter.updateById(
+          client._id,
+          {
+            $set: {
+              billing: ctx.params.billing,
+            },
+          },
+          (doc: any) => {
+            return doc;
+          }
+        );
+        if (!updatedDoc) {
+          return ctx.call('error.404');
+        }
+        return updatedDoc;
+      },
+
+    },
+
     update: {
       params: {
         id: 'string',
