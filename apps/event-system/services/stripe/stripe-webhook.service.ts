@@ -45,13 +45,16 @@ export default {
               },
             };
 
-            await ctx.broker.call('v1.clients.updateBillingByCustomerId', {
-              customerId: subscriptionUpdated?.customer,
-              billing,
-            });
-
-            const updatedClient = await ctx.broker.call('v1.clients.getByCustomerId', {
+            const updateClient = await ctx.broker.call(
+              'v1.clients.getByCustomerId',
+              {
                 customerId: subscriptionUpdated?.customer,
+              }
+            );
+
+            const updatedClient = await ctx.broker.call('v1.clients.update', {
+              id: updateClient?._id,
+              billing,
             });
 
             await ctx.broker.call('v1.tracking.public.track', {
@@ -68,7 +71,7 @@ export default {
           case 'customer.subscription.deleted':
             const subscriptionDeleted = event.data.object;
 
-            await stripe.subscriptions.create({
+            const subscriptionCreated = await stripe.subscriptions.create({
               customer: subscriptionDeleted?.customer as string,
               items: [
                 {
@@ -78,7 +81,7 @@ export default {
             });
 
             const client = await ctx.broker.call('v1.clients.getByCustomerId', {
-                customerId: subscriptionDeleted?.customer,
+              customerId: subscriptionDeleted?.customer,
             });
 
             await ctx.broker.call('v1.tracking.public.track', {
@@ -86,6 +89,15 @@ export default {
               data: {
                 event: 'DELETED_SUBSCRIPTION',
                 properties: subscriptionDeleted,
+                userId: client?.author?._id,
+              },
+            });
+
+            await ctx.broker.call('v1.tracking.public.track', {
+              path: 't',
+              data: {
+                event: 'CREATED_SUBSCRIPTION',
+                properties: subscriptionCreated,
                 userId: client?.author?._id,
               },
             });
