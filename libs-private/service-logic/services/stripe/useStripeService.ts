@@ -27,6 +27,7 @@ export const useStripeService = () => {
         const customer = await stripe.customers.create({
           name,
           email,
+          tax_exempt: 'exempt',
         });
 
         const subscription = await stripe.subscriptions.create({
