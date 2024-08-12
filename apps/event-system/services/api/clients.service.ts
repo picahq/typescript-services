@@ -164,6 +164,21 @@ module.exports = {
       },
     },
 
+    getByCustomerId: {
+      params: {
+        customerId: 'string',
+      },
+      async handler(ctx: any) {
+        const client = await this.adapter.findOne({
+          'billing.customerId': ctx.params.customerId,
+        });
+
+        if (!client) throw new Error('Client not found.');
+
+        return client;
+      },
+    },
+
     updateBillingByCustomerId: {
       params: {
         customerId: 'string',

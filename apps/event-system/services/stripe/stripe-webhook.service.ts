@@ -26,22 +26,7 @@ export default {
         );
 
         switch (event.type) {
-          case 'customer.created':
-            const customerCreated = event.data.object;
-
-            await stripe.subscriptions.create({
-              customer: customerCreated?.id as string,
-              items: [
-                {
-                  price: process.env.STRIPE_FREE_PLAN_ID,
-                },
-              ],
-            });
-
-            break;
-
           case 'customer.subscription.updated':
-          case 'customer.subscription.created':
             const subscriptionUpdated = event.data.object;
 
             const billing = {
@@ -55,7 +40,7 @@ export default {
                   process.env.STRIPE_GROWTH_PLAN_PRICE_ID
                     ? 'sub::growth'
                     : process.env.STRIPE_RIDICULOUSLY_CHEAP_PRICE_ID
-                    ? 'sub::cheap'
+                    ? 'sub::ridiculous'
                     : 'sub::free',
               },
             };
@@ -65,13 +50,26 @@ export default {
               billing,
             });
 
+            const updatedClient = await ctx.broker.call('v1.clients.getByCustomerId', {
+                customerId: subscriptionUpdated?.customer,
+            });
+
+            await ctx.broker.call('v1.tracking.public.track', {
+              path: 't',
+              data: {
+                event: 'UPDATED_SUBSCRIPTION',
+                properties: subscriptionUpdated,
+                userId: updatedClient?.author?._id,
+              },
+            });
+
             break;
 
           case 'customer.subscription.deleted':
-            const invoicePaymentFailed = event.data.object;
+            const subscriptionDeleted = event.data.object;
 
             await stripe.subscriptions.create({
-              customer: invoicePaymentFailed?.customer as string,
+              customer: subscriptionDeleted?.customer as string,
               items: [
                 {
                   price: process.env.STRIPE_FREE_PLAN_ID,
@@ -79,12 +77,24 @@ export default {
               ],
             });
 
+            const client = await ctx.broker.call('v1.clients.getByCustomerId', {
+                customerId: subscriptionDeleted?.customer,
+            });
+
+            await ctx.broker.call('v1.tracking.public.track', {
+              path: 't',
+              data: {
+                event: 'DELETED_SUBSCRIPTION',
+                properties: subscriptionDeleted,
+                userId: client?.author?._id,
+              },
+            });
+
             break;
         }
 
         return resultOk({ received: true });
       } catch (err) {
-        console.error(`Webhook Error: ${err}`);
         return resultErr<'service'>(
           false,
           'service_4000',

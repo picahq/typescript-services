@@ -15,7 +15,10 @@ export const useStripeService = () => {
       email: string;
     }): Promise<
       BResult<
-        Stripe.Response<Stripe.Customer>,
+        {
+          customer: Stripe.Customer;
+          subscription: Stripe.Subscription;
+        },
         'service',
         unknown
       >
@@ -26,7 +29,16 @@ export const useStripeService = () => {
           email,
         });
 
-        return resultOk(customer);
+        const subscription = await stripe.subscriptions.create({
+          customer: customer.id,
+          items: [
+            {
+              price: process.env.STRIPE_FREE_PLAN_ID,
+            },
+          ],
+        });
+
+        return resultOk({customer, subscription});
       } catch (error) {
         return resultErr<'service'>(
           false,
