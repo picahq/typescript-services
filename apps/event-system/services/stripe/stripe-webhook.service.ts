@@ -41,10 +41,10 @@ export default {
                   process.env.STRIPE_GROWTH_PLAN_PRICE_ID
                     ? 'sub::growth'
                     : (subscriptionUpdated as any)?.plan?.id ===
-                      process.env.STRIPE_RIDICULOUSLY_CHEAP_PRICE_ID
+                      process.env.STRIPE_RIDICULOUSLY_CHEAP_PLAN_PRICE_ID
                     ? 'sub::ridiculous'
                     : (subscriptionUpdated as any)?.plan?.id ===
-                      process.env.STRIPE_FREE_PRICE_ID
+                      process.env.STRIPE_FREE_PLAN_PRICE_ID
                     ? 'sub::free'
                     : 'sub::unknown',
               },
@@ -76,7 +76,7 @@ export default {
               customer: subscriptionDeleted?.customer as string,
               items: [
                 {
-                  price: process.env.STRIPE_FREE_PRICE_ID,
+                  price: process.env.STRIPE_FREE_PLAN_PRICE_ID,
                 },
               ],
             });
