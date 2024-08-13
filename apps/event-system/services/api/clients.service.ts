@@ -169,13 +169,15 @@ module.exports = {
         customerId: 'string',
       },
       async handler(ctx: any) {
-        const client = await this.adapter.findOne({
-          'billing.customerId': ctx.params.customerId,
-        });
+        try {
+          const client = await this.adapter.findOne({
+            'billing.customerId': ctx.params.customerId,
+          });
 
-        if (!client) throw new Error('Client not found.');
-
-        return client;
+          return client;
+        } catch (error) {
+          console.error(error);
+        }
       },
     },
 
@@ -186,7 +188,6 @@ module.exports = {
       },
 
       async handler(ctx: any) {
-
         const client = await this.adapter.findOne({
           'billing.customerId': ctx.params.customerId,
         });
@@ -207,7 +208,6 @@ module.exports = {
         }
         return updatedDoc;
       },
-
     },
 
     update: {
@@ -231,7 +231,7 @@ module.exports = {
           return ctx.call('error.404');
         }
         return updatedDoc;
-      }
+      },
     },
 
     get: {
