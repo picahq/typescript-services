@@ -176,7 +176,7 @@ module.exports = {
 
           return client;
         } catch (error) {
-          console.error(error);
+            return ctx.call('error.404');
         }
       },
     },
