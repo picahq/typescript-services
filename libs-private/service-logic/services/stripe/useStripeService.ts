@@ -34,7 +34,7 @@ export const useStripeService = () => {
           customer: customer.id,
           items: [
             {
-              price: process.env.STRIPE_FREE_PLAN_ID,
+              price: process.env.STRIPE_FREE_PLAN_PRICE_ID,
             },
           ],
         });

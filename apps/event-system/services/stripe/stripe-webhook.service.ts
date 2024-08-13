@@ -41,10 +41,10 @@ export default {
                   process.env.STRIPE_GROWTH_PLAN_PRICE_ID
                     ? 'sub::growth'
                     : (subscriptionUpdated as any)?.plan?.id ===
-                      process.env.STRIPE_RIDICULOUSLY_CHEAP_PRICE_ID
+                      process.env.STRIPE_RIDICULOUSLY_CHEAP_PLAN_PRICE_ID
                     ? 'sub::ridiculous'
                     : (subscriptionUpdated as any)?.plan?.id ===
-                      process.env.STRIPE_FREE_PLAN_ID
+                      process.env.STRIPE_FREE_PLAN_PRICE_ID
                     ? 'sub::free'
                     : 'sub::unknown',
               },
@@ -76,7 +76,7 @@ export default {
               customer: subscriptionDeleted?.customer as string,
               items: [
                 {
-                  price: process.env.STRIPE_FREE_PLAN_ID,
+                  price: process.env.STRIPE_FREE_PLAN_PRICE_ID,
                 },
               ],
             });
@@ -130,31 +130,33 @@ export default {
               }
             );
 
-            const failedBilling = {
-              ...failedInvoiceClient?.billing,
-              subscription: {
-                ...failedInvoiceClient?.billing?.subscription,
-                valid: false,
-                reason: 'payment_failed',
-              },
-            };
+            if (failedInvoiceClient) {
+              const failedBilling = {
+                ...failedInvoiceClient?.billing,
+                subscription: {
+                  ...failedInvoiceClient?.billing?.subscription,
+                  valid: false,
+                  reason: 'payment_failed',
+                },
+              };
 
-            const updatedFailedClient = await ctx.broker.call(
-              'v1.clients.updateBillingByCustomerId',
-              {
-                customerId: invoicePaymentFailed?.customer,
-                billing: failedBilling,
-              }
-            );
+              const updatedFailedClient = await ctx.broker.call(
+                'v1.clients.updateBillingByCustomerId',
+                {
+                  customerId: invoicePaymentFailed?.customer,
+                  billing: failedBilling,
+                }
+              );
 
-            await ctx.broker.call('v1.tracking.public.track', {
-              path: 't',
-              data: {
-                event: 'Failed Invoice Payment',
-                properties: invoicePaymentFailed,
-                userId: updatedFailedClient?.author?._id,
-              },
-            });
+              await ctx.broker.call('v1.tracking.public.track', {
+                path: 't',
+                data: {
+                  event: 'Failed Invoice Payment',
+                  properties: invoicePaymentFailed,
+                  userId: updatedFailedClient?.author?._id,
+                },
+              });
+            }
 
             break;
 
@@ -169,31 +171,33 @@ export default {
                 }
               );
 
-              const succeededBilling = {
-                ...succeededInvoiceClient?.billing,
-                subscription: {
-                  ...succeededInvoiceClient?.billing?.subscription,
-                  valid: true,
-                  reason: null,
-                },
-              };
+              if (succeededInvoiceClient) {
+                const succeededBilling = {
+                  ...succeededInvoiceClient?.billing,
+                  subscription: {
+                    ...succeededInvoiceClient?.billing?.subscription,
+                    valid: true,
+                    reason: null,
+                  },
+                };
 
-              const updatedSucceededClient = await ctx.broker.call(
-                'v1.clients.updateBillingByCustomerId',
-                {
-                  customerId: invoicePaymentSucceeded?.customer,
-                  billing: succeededBilling,
-                }
-              );
+                const updatedSucceededClient = await ctx.broker.call(
+                  'v1.clients.updateBillingByCustomerId',
+                  {
+                    customerId: invoicePaymentSucceeded?.customer,
+                    billing: succeededBilling,
+                  }
+                );
 
-              await ctx.broker.call('v1.tracking.public.track', {
-                path: 't',
-                data: {
-                  event: 'Successful Invoice Payment',
-                  properties: invoicePaymentSucceeded,
-                  userId: updatedSucceededClient?.author?._id,
-                },
-              });
+                await ctx.broker.call('v1.tracking.public.track', {
+                  path: 't',
+                  data: {
+                    event: 'Successful Invoice Payment',
+                    properties: invoicePaymentSucceeded,
+                    userId: updatedSucceededClient?.author?._id,
+                  },
+                });
+              }
             }, 5000);
             break;
         }
