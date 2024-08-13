@@ -164,6 +164,89 @@ module.exports = {
       },
     },
 
+    getByCustomerId: {
+      params: {
+        customerId: 'string',
+      },
+      async handler(ctx: any) {
+        const client = await this.adapter.findOne({
+          'billing.customerId': ctx.params.customerId,
+        });
+
+        if (!client) throw new Error('Client not found.');
+
+        return client;
+      },
+    },
+
+    updateBillingByCustomerId: {
+      params: {
+        customerId: 'string',
+        billing: { type: 'object' },
+      },
+
+      async handler(ctx: any) {
+
+        const client = await this.adapter.findOne({
+          'billing.customerId': ctx.params.customerId,
+        });
+
+        const updatedDoc = await this.adapter.updateById(
+          client._id,
+          {
+            $set: {
+              billing: ctx.params.billing,
+            },
+          },
+          (doc: any) => {
+            return doc;
+          }
+        );
+        if (!updatedDoc) {
+          return ctx.call('error.404');
+        }
+        return updatedDoc;
+      },
+
+    },
+
+    update: {
+      params: {
+        id: 'string',
+        billing: { type: 'object' },
+      },
+      async handler(ctx: any) {
+        const updatedDoc = await this.adapter.updateById(
+          ctx.params.id,
+          {
+            $set: {
+              billing: ctx.params.billing,
+            },
+          },
+          (doc: any) => {
+            return doc;
+          }
+        );
+        if (!updatedDoc) {
+          return ctx.call('error.404');
+        }
+        return updatedDoc;
+      }
+    },
+
+    get: {
+      params: {
+        id: 'string',
+      },
+      async handler(ctx: any) {
+        const doc = await this.adapter.findById(ctx.params.id);
+        if (!doc) {
+          return ctx.call('error.404');
+        }
+        return doc;
+      },
+    },
+
     create: {
       params: {
         name: { type: 'string' },
