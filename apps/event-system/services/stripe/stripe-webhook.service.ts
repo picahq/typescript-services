@@ -159,41 +159,42 @@ export default {
             break;
 
           case 'invoice.payment_succeeded':
-            const invoicePaymentSucceeded = event.data.object;
+            setTimeout(async () => {
+              const invoicePaymentSucceeded = event.data.object;
 
-            const succeededInvoiceClient = await ctx.broker.call(
-              'v1.clients.getByCustomerId',
-              {
-                customerId: invoicePaymentSucceeded?.customer,
-              }
-            );
+              const succeededInvoiceClient = await ctx.broker.call(
+                'v1.clients.getByCustomerId',
+                {
+                  customerId: invoicePaymentSucceeded?.customer,
+                }
+              );
 
-            const succeededBilling = {
-              ...succeededInvoiceClient?.billing,
-              subscription: {
-                ...succeededInvoiceClient?.billing?.subscription,
-                valid: true,
-                reason: null,
-              },
-            };
+              const succeededBilling = {
+                ...succeededInvoiceClient?.billing,
+                subscription: {
+                  ...succeededInvoiceClient?.billing?.subscription,
+                  valid: true,
+                  reason: null,
+                },
+              };
 
-            const updatedSucceededClient = await ctx.broker.call(
-              'v1.clients.updateBillingByCustomerId',
-              {
-                customerId: invoicePaymentSucceeded?.customer,
-                billing: succeededBilling,
-              }
-            );
+              const updatedSucceededClient = await ctx.broker.call(
+                'v1.clients.updateBillingByCustomerId',
+                {
+                  customerId: invoicePaymentSucceeded?.customer,
+                  billing: succeededBilling,
+                }
+              );
 
-            await ctx.broker.call('v1.tracking.public.track', {
-              path: 't',
-              data: {
-                event: 'Successful Invoice Payment',
-                properties: invoicePaymentSucceeded,
-                userId: updatedSucceededClient?.author?._id,
-              },
-            });
-
+              await ctx.broker.call('v1.tracking.public.track', {
+                path: 't',
+                data: {
+                  event: 'Successful Invoice Payment',
+                  properties: invoicePaymentSucceeded,
+                  userId: updatedSucceededClient?.author?._id,
+                },
+              });
+            }, 5000);
             break;
         }
 
