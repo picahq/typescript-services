@@ -31,7 +31,8 @@ export const createEventLinkTokenApi = async (
       { headers }
     );
 
-    const connectionDefinitionUrl = `${process.env.API_BASE_URL}/v1/public/connection-definitions`;
+    const apiBaseUrl = process.env.INTEGRATIONOS_API_BASE_URL || "https://api.integrationos.com/v1";
+    const connectionDefinitionUrl = `${apiBaseUrl}/public/connection-definitions`;
 
     const connectionDefinitions = await axios.get<ConnectionDefinitions>(
       `${connectionDefinitionUrl}?limit=100&skip=0`

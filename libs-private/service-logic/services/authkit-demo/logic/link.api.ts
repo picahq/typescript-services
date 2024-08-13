@@ -41,7 +41,8 @@ export const createEventLinkTokenApi = async (
 
   const { data: linkData } = matchResultAndHandleHttpError(link, identity);
 
-  const connectionDefinitionUrl = `${process.env.API_BASE_URL}/v1/public/connection-definitions`;
+  const apiBaseUrl = process.env.INTEGRATIONOS_API_BASE_URL || "https://api.integrationos.com/v1";
+  const connectionDefinitionUrl = `${apiBaseUrl}/public/connection-definitions`;
 
   const connectionDefinitions =
     await makeHttpNetworkCall<ConnectionDefinitions>({
