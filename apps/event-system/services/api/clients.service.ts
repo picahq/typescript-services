@@ -217,7 +217,7 @@ module.exports = {
             {
               $set: {
                 'billing.subscription.valid': false,
-                'billing.subscription.reason': 'payment_failed',
+                'billing.subscription.reason': 'payment-failed',
               },
             },
             (doc: any) => {
