@@ -164,19 +164,74 @@ module.exports = {
       },
     },
 
-    getByCustomerId: {
+    updateOnInvoicePaymentSuccess: {
       params: {
         customerId: 'string',
+        endDate: 'number',
       },
+
       async handler(ctx: any) {
         try {
           const client = await this.adapter.findOne({
             'billing.customerId': ctx.params.customerId,
           });
 
-          return client;
-        } catch (error) {
+          const updateDoc = await this.adapter.updateById(
+            client._id,
+            {
+              $set: {
+                'billing.subscription.valid': true,
+                'billing.subscription.reason': null,
+                'billing.subscription.endDate': ctx.params.endDate,
+              },
+            },
+            (doc: any) => {
+              return doc;
+            }
+          );
+
+          if (!updateDoc) {
             return await ctx.call('error.404');
+          }
+
+          return updateDoc;
+        } catch (error) {
+          return await ctx.call('error.404');
+        }
+      },
+    },
+
+    updateOnInvoicePaymentFailed: {
+      params: {
+        customerId: 'string',
+      },
+
+      async handler(ctx: any) {
+        try {
+          const client = await this.adapter.findOne({
+            'billing.customerId': ctx.params.customerId,
+          });
+
+          const updateDoc = await this.adapter.updateById(
+            client._id,
+            {
+              $set: {
+                'billing.subscription.valid': false,
+                'billing.subscription.reason': 'payment_failed',
+              },
+            },
+            (doc: any) => {
+              return doc;
+            }
+          );
+
+          if (!updateDoc) {
+            return await ctx.call('error.404');
+          }
+
+          return updateDoc;
+        } catch (error) {
+          return await ctx.call('error.404');
         }
       },
     },

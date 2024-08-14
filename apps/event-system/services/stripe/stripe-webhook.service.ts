@@ -124,81 +124,48 @@ export default {
             const invoicePaymentFailed = event.data.object;
 
             const failedInvoiceClient = await ctx.broker.call(
-              'v1.clients.getByCustomerId',
+              'v1.clients.updateOnInvoicePaymentFailed',
               {
                 customerId: invoicePaymentFailed?.customer,
               }
             );
 
-            if (failedInvoiceClient) {
-              const failedBilling = {
-                ...failedInvoiceClient?.billing,
-                subscription: {
-                  ...failedInvoiceClient?.billing?.subscription,
-                  valid: false,
-                  reason: 'payment_failed',
-                },
-              };
-
-              const updatedFailedClient = await ctx.broker.call(
-                'v1.clients.updateBillingByCustomerId',
-                {
-                  customerId: invoicePaymentFailed?.customer,
-                  billing: failedBilling,
-                }
-              );
-
-              await ctx.broker.call('v1.tracking.public.track', {
-                path: 't',
-                data: {
-                  event: 'Failed Invoice Payment',
-                  properties: invoicePaymentFailed,
-                  userId: updatedFailedClient?.author?._id,
-                },
-              });
-            }
-
+            await ctx.broker.call('v1.tracking.public.track', {
+              path: 't',
+              data: {
+                event: 'Failed Invoice Payment',
+                properties: invoicePaymentFailed,
+                userId: failedInvoiceClient?.author?._id,
+              },
+            });
             break;
 
           case 'invoice.payment_succeeded':
-            setTimeout(async () => {
-              const invoicePaymentSucceeded = event.data.object;
+          
+            const invoicePaymentSucceeded = event.data.object;
 
-              const succeededInvoiceClient = await ctx.broker.call(
-                'v1.clients.getByCustomerId',
-                {
-                  customerId: invoicePaymentSucceeded?.customer,
-                }
-              );
+            const subscription = await stripe.subscriptions.retrieve(
+              invoicePaymentSucceeded?.subscription as string
+            );
 
-              if (succeededInvoiceClient) {
-                const succeededBilling = {
-                  ...succeededInvoiceClient?.billing,
-                  subscription: {
-                    ...succeededInvoiceClient?.billing?.subscription,
-                    valid: true,
-                    reason: null,
-                  },
-                };
-
-                const updatedSucceededClient = await ctx.broker.call(
-                  'v1.clients.updateBillingByCustomerId',
-                  {
-                    customerId: invoicePaymentSucceeded?.customer,
-                    billing: succeededBilling,
-                  }
-                );
-
-                await ctx.broker.call('v1.tracking.public.track', {
-                  path: 't',
-                  data: {
-                    event: 'Successful Invoice Payment',
-                    properties: invoicePaymentSucceeded,
-                    userId: updatedSucceededClient?.author?._id,
-                  },
-                });
+            const succeededInvoiceClient = await ctx.broker.call(
+              'v1.clients.updateOnInvoicePaymentSuccess',
+              {
+                customerId: invoicePaymentSucceeded?.customer,
+                endDate: subscription?.current_period_end,
               }
-            }, 5000);
+            );
+            
+            await ctx.broker.call('v1.tracking.public.track', {
+              path: 't',
+              data: {
+                event: 'Successful Invoice Payment',
+                properties: invoicePaymentSucceeded,
+                userId: succeededInvoiceClient?.author?._id,
+              },
+            });
+
+
             break;
         }
 
