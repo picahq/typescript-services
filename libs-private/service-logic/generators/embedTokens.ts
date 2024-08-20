@@ -2,16 +2,18 @@ import {
   EmbedTokenRecord,
   EmbedTokensPayload,
 } from '@event-inc/types/embed-tokens';
-import { generateId } from '@integrationos/rust-utils';
+import { generateId } from '../service-helper';
 
-export const generateEmbedTokensRecord = ({
+export const generateEmbedTokensRecord = async ({
   label,
   group,
   ttl,
   linkSettings,
   environment,
   features,
-}: EmbedTokensPayload): EmbedTokenRecord => {
+}: EmbedTokensPayload): Promise<EmbedTokenRecord> => {
+  const sessionId = await generateId('session_id');
+
   return {
     label,
     group,
@@ -20,7 +22,7 @@ export const generateEmbedTokensRecord = ({
     createdDate: new Date(),
     expiresAt: new Date().getTime() + ttl,
     environment,
-    sessionId: generateId('session_id'),
+    sessionId,
     features,
   };
 };

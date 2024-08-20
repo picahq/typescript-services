@@ -1,8 +1,8 @@
 import { CreateEventLinkPayload, EventLink } from '@event-inc/types';
 import { Ownership } from '@event-inc/types/generic';
-import { generateId } from '@integrationos/rust-utils';
+import { generateId } from '@libs-private/utils';
 
-export const generateEventLinkRecord = ({
+export const generateEventLinkRecord = async ({
   version = '1.0.0_04.44_18-04-2023T10-33-00',
   label,
   group,
@@ -12,14 +12,16 @@ export const generateEventLinkRecord = ({
   usageSource,
 }: CreateEventLinkPayload & {
   ownership: Ownership;
-}): EventLink => {
+}): Promise<EventLink> => {
+  const tokenId = await generateId('ln_tk');
+
   return {
     _type: 'event-link',
     version,
     ownership,
     label,
     group,
-    token: generateId('ln_tk'),
+    token: tokenId,
     createdAt: Date.now(),
     createdDate: new Date(),
     expiresAt: new Date().getTime() + ttl,

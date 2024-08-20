@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { generateId } from '@integrationos/rust-utils';
 import {
   CreateEventLinkPayload,
   LinkSettings,
@@ -7,6 +6,22 @@ import {
   ConnectionDefinitions,
   EmbedTokenRecord,
 } from '../types';
+
+export const generateId = async (prefix: string) => {
+  try {
+    const response = await axios.get<{
+      id: string
+    }>(
+      `https://api.integrationos.com/v1/public/generate-id/${prefix}`
+    );
+
+    const id = response?.data?.id;
+
+    return id;
+  } catch (error) {
+    throw new Error('Failed to generate id from api');
+  }
+}
 
 export const createEventLinkTokenApi = async (
   headers: Record<string, string>,
@@ -62,6 +77,8 @@ export const createEventLinkTokenApi = async (
           : platform?.environment === 'test' || !platform?.environment
     );
 
+    const sessionId = await generateId('session_id');
+
     const tokenPayload = {
       linkSettings: {
         connectedPlatforms: connectedPlatformsFiltered ?? [],
@@ -71,7 +88,7 @@ export const createEventLinkTokenApi = async (
       label: link?.data?.label,
       environment: secret.startsWith('sk_test') ? 'test' : 'live',
       expiresAt: new Date().getTime() + 5 * 1000 * 60,
-      sessionId: generateId('session_id'),
+      sessionId,
       features: settings?.data?.features,
     };
 

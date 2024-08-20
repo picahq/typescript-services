@@ -15,7 +15,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN --mount=type=secret,id=NPM_TOKEN NPM_TOKEN=$(cat /run/secrets/NPM_TOKEN) npm i --ignore-scripts && npm i @integrationos/rust-utils
+RUN --mount=type=secret,id=NPM_TOKEN NPM_TOKEN=$(cat /run/secrets/NPM_TOKEN) npm i --ignore-scripts
 
 # Build
 RUN npm run build

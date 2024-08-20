@@ -1,11 +1,11 @@
 import { Event, EventCreateInitialPayload } from '@libs-private/data-models';
 import { getTopicDetails } from '../../../utils/events';
 import {
+  generateId,
   generatePrivateKey,
   getWalletFromPrivateKey,
   hashMessage,
 } from '../../service-helper';
-import { generateId } from '@integrationos/rust-utils';
 
 export const generateExternalEvent = async ({
   environment,
@@ -30,9 +30,12 @@ export const generateExternalEvent = async ({
     body: _body,
   });
 
+  const eventId = await generateId('evt');
+  const eventKeyId = await generateId('evt_k');
+
   const event: Event = {
-    _id: generateId('evt'),
-    key: generateId('evt_k'),
+    _id: eventId,
+    key: eventKeyId,
     topic,
     environment,
     body: _body,
