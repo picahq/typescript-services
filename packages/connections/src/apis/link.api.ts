@@ -8,11 +8,13 @@ import {
 } from '../types';
 
 export const generateId = async (prefix: string) => {
+  const apiBaseUrl = process.env.INTEGRATIONOS_API_BASE_URL || "https://api.integrationos.com/v1";
+
   try {
     const response = await axios.get<{
       id: string
     }>(
-      `https://api.integrationos.com/v1/public/generate-id/${prefix}`
+      `${apiBaseUrl}/public/generate-id/${prefix}`
     );
 
     const id = response?.data?.id;
