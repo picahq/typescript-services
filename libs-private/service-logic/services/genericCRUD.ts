@@ -11,8 +11,7 @@ import {
 } from '@libs-private/data-models';
 import { Rename } from '@event-inc/types';
 import { Context } from 'moleculer';
-import { getCreatedFields, getUpdatedFields } from '../../utils';
-import { generateId } from '@integrationos/rust-utils';
+import { generateId, getCreatedFields, getUpdatedFields } from '../../utils';
 import {
   UpdateManyModel,
   DeleteManyModel,
@@ -33,9 +32,9 @@ const addOwnershipToQuery = (
 ) =>
   enabled
     ? {
-        ...query,
-        'ownership.buildableId': ownership.buildableId,
-      }
+      ...query,
+      'ownership.buildableId': ownership.buildableId,
+    }
     : query;
 
 const handleReturningOnDuplicate = async <T>(
@@ -158,7 +157,7 @@ export const useGenericCRUDService = (
       data: Omit<T, keyof WithCreate | keyof WithId | 'ownership'>,
       meta?: unknown
     ): Promise<BResult<T & WithCreate & WithId & Ownership, 'service'>> {
-      const _id = generateId(prefix);
+      const _id = await generateId(prefix);
       const fullActionName = `${service}.create`;
       const createFields = getCreatedFields();
       try {

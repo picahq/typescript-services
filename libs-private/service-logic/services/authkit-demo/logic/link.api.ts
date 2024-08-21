@@ -10,7 +10,7 @@ import {
 } from '@event-inc/utils';
 import { identity } from 'ramda';
 import { EmbedTokenRecord } from '@event-inc/types/embed-tokens';
-import { generateId } from '@integrationos/rust-utils';
+import { generateId } from '@libs-private/utils';
 
 export const createEventLinkTokenApi = async (
   headers: Record<string, string>,
@@ -75,6 +75,8 @@ export const createEventLinkTokenApi = async (
         : platform?.environment === 'test' || !platform?.environment
   );
 
+  const sessionId = await generateId('session_id');
+
   const tokenPayload = {
     linkSettings: {
       connectedPlatforms: connectedPlatformsFiltered ?? [],
@@ -84,7 +86,7 @@ export const createEventLinkTokenApi = async (
     label: linkData?.label,
     environment: isLiveSecret ? 'live' : 'test',
     expiresAt: new Date().getTime() + 5 * 1000 * 60,
-    sessionId: generateId('session_id'),
+    sessionId,
     features: data?.features
   };
 

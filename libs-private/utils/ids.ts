@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { get } from 'lodash';
 
 export const cleanIdPath = (idPath: string) => idPath.replace('_.', '');
@@ -66,3 +67,21 @@ export const generateKey = ({
 
   return finalizedKeyComponents.join(separator);
 };
+
+export const generateId = async (prefix: string) => {
+  const apiBaseUrl = process.env.INTEGRATIONOS_API_BASE_URL || "https://api.integrationos.com/v1";
+
+  try {
+    const response = await axios.get<{
+      id: string
+    }>(
+      `${apiBaseUrl}/public/generate-id/${prefix}`
+    );
+
+    const id = response?.data?.id;
+
+    return id;
+  } catch (error) {
+    throw new Error('Failed to generate id from api');
+  }
+}

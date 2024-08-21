@@ -27,7 +27,7 @@ import { useEventAccessService } from '../events/useEventAccessService';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { generateEmbedTokensRecord } from '@libs-private/service-logic/generators/embedTokens';
-import { generateId } from '@integrationos/rust-utils';
+import { generateId } from '@libs-private/utils';
 
 const GET_EVENT_ACCESS_RECORD_URL = process.env.CONNECTIONS_API_BASE_URL + 'v1/event-access';
 const CREATE_CONNECTION_URL = process.env.CONNECTIONS_API_BASE_URL + 'v1/connections';
@@ -55,7 +55,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
     }: CreateEventLinkPayload): Promise<
       BResult<EventLink, 'service', unknown>
     > {
-      const link = generateEventLinkRecord({
+      const link = await generateEventLinkRecord({
         label,
         group,
         ttl,
@@ -310,7 +310,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       );
 
       // Generate a link record
-      const link = generateEventLinkRecord({
+      const link = await generateEventLinkRecord({
         label: 'My Connection',
         group: `connection-${uuidv4().replace(/-/g, '').substring(0, 10)}`,
         ttl: 2 * 1000 * 60 * 60,
@@ -358,6 +358,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         }
       );
 
+      const sessionId = await generateId('session_id');
+
       const tokenPayload = {
         linkSettings: {
           connectedPlatforms: connectedPlatforms ?? [],
@@ -370,10 +372,10 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           ? 'test'
           : 'live',
         features: settings?.features,
-        sessionId: generateId('session_id'),
+        sessionId
       };
 
-      const embedToken = generateEmbedTokensRecord(tokenPayload);
+      const embedToken = await generateEmbedTokensRecord(tokenPayload);
 
       const { create: createEmbedToken } = useGenericCRUDService(
         ctx,
@@ -429,7 +431,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       );
 
       // Generate a link record
-      const link = generateEventLinkRecord({
+      const link = await generateEventLinkRecord({
         label: 'My Connection',
         group: `connection-${uuidv4().replace(/-/g, '').substring(0, 10)}`,
         ttl: 2 * 1000 * 60 * 60,
@@ -475,6 +477,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         }
       );
 
+      const sessionId = await generateId('session_id');
+
       const tokenPayload = {
         linkSettings: {
           connectedPlatforms: connectedPlatforms ?? [],
@@ -485,10 +489,10 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         ttl: 5 * 60 * 1000,
         environment: 'test',
         features: settings?.features,
-        sessionId: generateId('session_id'),
+        sessionId,
       };
 
-      const embedToken = generateEmbedTokensRecord(tokenPayload);
+      const embedToken = await generateEmbedTokensRecord(tokenPayload);
 
       const { create: createEmbedToken } = useGenericCRUDService(
         ctx,
