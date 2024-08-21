@@ -123,8 +123,18 @@ export default {
           case 'invoice.payment_failed':
             const invoicePaymentFailed = event.data.object;
 
-            const failedInvoiceClient = await ctx.broker.call(
-              'v1.clients.updateOnInvoicePaymentFailed',
+            const currentSubscription = await stripe.subscriptions.retrieve(
+              invoicePaymentFailed?.subscription as string
+            );
+
+            if (currentSubscription?.status !== 'active') {
+              await ctx.broker.call('v1.clients.updateOnInvoicePaymentFailed', {
+                customerId: invoicePaymentFailed?.customer,
+              });
+            }
+
+            const currentClient = await ctx.broker.call(
+              'v1.clients.getByCustomerId',
               {
                 customerId: invoicePaymentFailed?.customer,
               }
@@ -135,13 +145,12 @@ export default {
               data: {
                 event: 'Failed Invoice Payment',
                 properties: invoicePaymentFailed,
-                userId: failedInvoiceClient?.author?._id,
+                userId: currentClient?.author?._id,
               },
             });
             break;
 
           case 'invoice.payment_succeeded':
-          
             const invoicePaymentSucceeded = event.data.object;
 
             const subscription = await stripe.subscriptions.retrieve(
@@ -155,7 +164,7 @@ export default {
                 endDate: subscription?.current_period_end,
               }
             );
-            
+
             await ctx.broker.call('v1.tracking.public.track', {
               path: 't',
               data: {
@@ -164,7 +173,6 @@ export default {
                 userId: succeededInvoiceClient?.author?._id,
               },
             });
-
 
             break;
         }
@@ -182,4 +190,5 @@ export default {
     },
   },
 } as ServiceSchema;
+
 
