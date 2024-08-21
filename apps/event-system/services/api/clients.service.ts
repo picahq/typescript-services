@@ -236,6 +236,27 @@ module.exports = {
       },
     },
 
+    getByCustomerId: {
+      params: {
+        customerId: 'string',
+      },
+      async handler(ctx: any) {
+        try {
+          const client = await this.adapter.findOne({
+            'billing.customerId': ctx.params.customerId,
+          });
+
+          if (!client) {
+            return await ctx.call('error.404');
+          }
+
+          return client;
+        } catch (error) {
+          return await ctx.call('error.404');
+        }
+      },
+    },
+
     updateBillingByCustomerId: {
       params: {
         customerId: 'string',
