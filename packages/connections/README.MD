@@ -27,8 +27,8 @@ app.post("/authkit-token", async (request, response) => {
   const authKitToken = new AuthKitToken("sk_live_1234");
 
   const token = await authKitToken.create({
-    group: "meaningful-id", // a meaningful identifier (i.e., organizationId)
-    label: "Friendly Label" // a human-friendly label (i.e., organizationName)
+    group: "org_123", // a meaningful identifier (i.e., organizationId)
+    label: "Acme" // a human-friendly label (i.e., organizationName)
   });
 
   response.send(token);
@@ -37,7 +37,7 @@ app.post("/authkit-token", async (request, response) => {
 
 You'll want to switch out the API Key for your own, which will later tell your frontend which integrations you'd like to make available to your users.
 
-You'll also want to populate the `Group` and `Label` fields depending on how you want to organize and query your users' connected accounts. The Group is especially important as it's used to generate the unique [Connection Key](https://docs.integrationos.com/docs/setup) for the user once they successfully connect an account.
+You'll also want to populate the `group` and `label` fields depending on how you want to organize and query your users' connected accounts. The Group is especially important as it's used to generate the unique [Connection Key](https://docs.integrationos.com/docs/setup) for the user once they successfully connect an account.
 
 ## Full Documentation
 
