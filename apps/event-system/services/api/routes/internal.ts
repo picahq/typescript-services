@@ -19,6 +19,7 @@ export const internalRoute = () => ({
 
     'v1.settings.public.create',
     'v1.settings.public.get',
+    'v1.settings.public.updateNonOauthPlatforms',
 
     'v1.stripe.public.createCustomer',
     'v1.stripe.public.getSubscription',
@@ -48,6 +49,7 @@ export const internalRoute = () => ({
     // Settings
     'POST v1/settings/create': 'v1.settings.public.create',
     'POST v1/settings/get': 'v1.settings.public.get',
+    'POST v1/settings/update': 'v1.settings.public.updateNonOauthPlatforms',
 
     // Stripe
     'POST v1/stripe/create-customer': 'v1.stripe.public.createCustomer',
