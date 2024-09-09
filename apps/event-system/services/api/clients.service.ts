@@ -9,10 +9,10 @@ const { errors } = vars;
 const { messages } = errors;
 
 const addOnlyOwnedToQuery = (ctx: any) =>
-  (ctx.params.query = {
-    ...ctx.params.query,
-    'author._id': ctx.meta.user._id,
-  });
+(ctx.params.query = {
+  ...ctx.params.query,
+  'author._id': ctx.meta.user._id,
+});
 
 const addCreatedAt = (ctx: any) =>
   (ctx.params.createdAt = new Date().getTime());
@@ -21,11 +21,11 @@ const addUpdatedAt = (ctx: any) =>
   (ctx.params.updatedAt = new Date().getTime());
 
 const addUpdatedBy = (ctx: any) =>
-  (ctx.params.updatedBy = {
-    ...(get(ctx, 'meta.user._id')
-      ? { _id: ctx.meta.user._id, firstName: ctx.meta.user.firstName }
-      : { _id: 'anonymous' }),
-  });
+(ctx.params.updatedBy = {
+  ...(get(ctx, 'meta.user._id')
+    ? { _id: ctx.meta.user._id, firstName: ctx.meta.user.firstName }
+    : { _id: 'anonymous' }),
+});
 
 const editableOnlyByOwner = async (ctx: any) => {
   const entity = await ctx.broker.call(
