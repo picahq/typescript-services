@@ -14,6 +14,7 @@ export const Services = {
   Tracking: 'v1.tracking',
   ConnectionTesting: 'v1.connection-testing',
   PlatformsOauth: 'v1.platforms-oauth',
+  Onboarding: 'v1.onboarding',
 } as const;
 
 type keys = keyof typeof Services;
