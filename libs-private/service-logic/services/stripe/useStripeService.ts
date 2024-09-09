@@ -90,6 +90,41 @@ export const useStripeService = () => {
         );
       }
     },
+    
+    async listProducts({subscriptionId}: {subscriptionId: string}): Promise<BResult<Stripe.Product[], 'service', unknown>> {
+      try {
+       
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        if (!subscription) {
+          return resultErr<'service'>(
+            false,
+            'service_4000',
+            'Failed to get subscription',
+            'buildable-core',
+            false
+          );
+        }
+
+        const products: Stripe.Product[] = [];
+
+        for (const item of subscription.items.data) {
+          const product = await stripe.products.retrieve(item.price.product as string);
+          products.push(product);
+        }
+        
+        return resultOk(products);
+
+        
+      } catch (error) {
+        return resultErr<'service'>(
+          false,
+          'service_4000',
+          'Failed to list products',
+          'buildable-core',
+          false
+        );
+      }
+    },
 
     async createBillingPortalSession({
       customerId,

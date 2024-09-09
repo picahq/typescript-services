@@ -10,6 +10,7 @@ import { getProductSchema } from './schema/getProduct.schema';
 import { createBillingPortalSchema } from './schema/createBillingPortal.schema';
 import { listPaymentMethodsSchema } from './schema/listPaymentMethods.schema';
 import { listInvoicesSchema } from './schema/listInvoices.schema';
+import { listProductsSchema } from './schema/listProducts.schema';
 const MongoDBAdapter = require('moleculer-db-adapter-mongo');
 
 export default class Stripe extends GenericServiceProvider {
@@ -24,6 +25,7 @@ export default class Stripe extends GenericServiceProvider {
         createCustomer: [createCustomerSchema, publicCreateCustomer],
         getSubscription: [getSubscriptionSchema, publicGetSubscription],
         getProduct: [getProductSchema, publicGetProduct],
+        listProducts: [listProductsSchema, publicListProducts],
         createBillingPortalSession: [
           createBillingPortalSchema,
           publicCreateBillingPortalSession,
@@ -63,6 +65,16 @@ const publicGetProduct = async (ctx: Context<unknown, ServiceContextMeta>) => {
   const { getProduct } = useStripeService();
 
   return (await getProduct(ctx.params as { id: string })).unwrap();
+};
+
+const publicListProducts = async (
+  ctx: Context<unknown, ServiceContextMeta>
+) => {
+  const { listProducts } = useStripeService();
+
+  return (await listProducts(
+    ctx.params as { subscriptionId: string }
+  )).unwrap();
 };
 
 const publicCreateBillingPortalSession = async (
