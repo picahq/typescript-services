@@ -20,7 +20,6 @@ export default class Settings extends GenericServiceProvider {
       publicActions: {
         create: [createSettingsSchema, publicCreateOrUpdate],
         get: [{}, publicGet],
-        updateNonOauthPlatforms: [{}, publicUpdateNonOauthPlatforms]
       },
     });
   }
@@ -34,16 +33,6 @@ const publicCreateOrUpdate = async (
     makeOwnershipFromContextMeta(ctx)
   );
   return (await createOrUpdate(ctx.params as CreateSettingPayload)).unwrap();
-};
-
-const publicUpdateNonOauthPlatforms = async (
-  ctx: Context<unknown, ServiceContextMeta>
-) => {
-  const { updateNonOauthPlatforms } = useSettingsService(
-    ctx,
-    makeOwnershipFromContextMeta(ctx)
-  );
-  return (await updateNonOauthPlatforms()).unwrap();
 };
 
 const publicGet = async (ctx: Context<unknown, ServiceContextMeta>) => {
