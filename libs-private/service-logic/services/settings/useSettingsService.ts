@@ -15,9 +15,9 @@ import {
 } from '@event-inc/types/settings';
 import { BResult } from '@event-inc/types';
 import { generateSettingRecord } from '@libs-private/service-logic/generators/settings/linkSettings';
-import { generateMeta } from '../../../utils/meta';
 import { resultOk, resultErr } from '@event-inc/utils';
 import { createSecret } from '@libs-private/utils/secretsCaller';
+import EventAccess from '@apps/event-system/services/events/event-access.service';
 
 const SERVICE_NAME = Services.Settings;
 
@@ -28,6 +28,15 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
     find,
     updateById,
   } = useGenericCRUDService(ctx, SERVICE_NAME, ownership);
+
+  const { find: findEventAccess } = useGenericCRUDService(
+    ctx,
+    Services.EventAccess,
+    ownership,
+    {
+      DISABLE_ADDING_OWNERSHIP_CHECK: true,
+    }
+  );
 
   return {
     find,
@@ -59,10 +68,19 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
       try {
         const settingsRecord = (await _list()).unwrap().rows[0] as Settings;
 
+        const eventAccessRecordResult = await findEventAccess<EventAccess>({
+          query: {
+            "ownership.buildableId": ownership.buildableId,
+            "key": `event_access::custom::${platform.environment}::default::event-inc::internal-ui`
+          },
+        });
+
+        const eventAccessRecord = eventAccessRecordResult.unwrap()?.[0];
+
         if (configuration) {
           const secretsRecord = await createSecret(
             JSON.stringify(configuration),
-            ownership.buildableId
+            eventAccessRecord?.accessKey
           );
 
           platform.secretsServiceId = secretsRecord._id;
