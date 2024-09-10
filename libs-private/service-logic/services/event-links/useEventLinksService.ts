@@ -122,6 +122,21 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           identity
         );
 
+        // Get the connection definition by id
+        const connectionDefinitions =
+          await makeHttpNetworkCall<ConnectionDefinitions>({
+            url: `${LIST_CONNECTION_DEFINITIONS_URL}?limit=100&skip=0&active=true`,
+            method: 'GET',
+          });
+        const { data } = matchResultAndHandleHttpError(
+          connectionDefinitions,
+          identity
+        );
+
+        const connectionDefinition = data?.rows?.find(
+          (row) => row?._id === connectionDefinitionId
+        );
+
         const connection = await makeHttpNetworkCall<ConnectionRecord>({
           url: CREATE_CONNECTION_URL,
           method: 'POST',
@@ -133,14 +148,18 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           data: {
             active: true,
             connectionDefinitionId,
-            name: authFormData['NAME'] ?? link?.label,
+            name: authFormData['NAME']
+              ? authFormData['NAME']
+              : link?.usageSource === 'user-dashboard'
+              ? `${connectionDefinition?.frontend?.spec?.title} sandbox account`
+              : link?.label,
             authFormData,
             group: authFormData['NAME']
               ? `${_.replace(
-                authFormData['NAME'],
-                /[^a-zA-Z0-9_]/g,
-                '-'
-              ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
+                  authFormData['NAME'],
+                  /[^a-zA-Z0-9_]/g,
+                  '-'
+                ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
               : link?.group,
           },
         });
@@ -225,6 +244,21 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           identity
         );
 
+        // Get the connection definition by id
+        const connectionDefinitions =
+          await makeHttpNetworkCall<ConnectionDefinitions>({
+            url: `${LIST_CONNECTION_DEFINITIONS_URL}?limit=100&skip=0&active=true`,
+            method: 'GET',
+          });
+        const { data } = matchResultAndHandleHttpError(
+          connectionDefinitions,
+          identity
+        );
+
+        const connectionDefinition = data?.rows?.find(
+          (row) => row?._id === connectionDefinitionId
+        );
+
         let secret = headers['x-integrationos-secret'];
 
         if (!secret || secret === 'redacted') {
@@ -245,17 +279,21 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
               code,
               redirectUri,
               formData,
-              additionalData
+              additionalData,
             },
             type,
             connectionDefinitionId,
-            label: formData?.['NAME'] ?? link?.label,
+            label: formData?.['NAME']
+              ? formData?.['NAME']
+              : link?.usageSource === 'user-dashboard'
+              ? `${connectionDefinition?.frontend?.spec?.title} sandbox account`
+              : link?.label,
             group: formData?.['NAME']
               ? `${_.replace(
-                formData?.['NAME'] as string,
-                /[^a-zA-Z0-9_]/g,
-                '-'
-              ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
+                  formData?.['NAME'] as string,
+                  /[^a-zA-Z0-9_]/g,
+                  '-'
+                ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
               : link?.group,
           },
         });
