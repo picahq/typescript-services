@@ -5,14 +5,14 @@ import {
   Feature,
 } from '@event-inc/types/settings';
 
-export const generateSettingRecord = ({
-  platform,
+export const generateSettingsRecord = ({
   ownership,
   features,
+  platforms,
 }: {
-  platform: Platform;
   ownership: Ownership;
   features?: Feature[];
+  platforms: Platform[];
 }): Settings => {
   return {
     createdAt: Date.now(),
@@ -20,7 +20,7 @@ export const generateSettingRecord = ({
     ownership,
     updatedAt: Date.now(),
     updatedDate: new Date(),
-    connectedPlatforms: [platform],
+    connectedPlatforms: platforms,
     features,
   };
 };

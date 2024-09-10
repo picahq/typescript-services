@@ -1,8 +1,5 @@
 import {
   FindRequest,
-  GetRequest,
-  ListRequest,
-  ListResponse,
   Ownership,
 } from '@libs-private/data-models';
 import { Services } from '@event-inc/private::types';
@@ -13,13 +10,17 @@ import {
   LinkSettings as Settings,
   Feature,
 } from '@event-inc/types/settings';
-import { BResult } from '@event-inc/types';
-import { generateSettingRecord } from '@libs-private/service-logic/generators/settings/linkSettings';
-import { resultOk, resultErr } from '@event-inc/utils';
-import { createSecret } from '@libs-private/utils/secretsCaller';
 import EventAccess from '@apps/event-system/services/events/event-access.service';
+import { BResult, ConnectionDefinitions } from '@event-inc/types';
+import { generateSettingsRecord } from '@libs-private/service-logic/generators/settings/linkSettings';
+import { resultOk, resultErr, makeHttpNetworkCall, matchResultAndHandleHttpError } from '@event-inc/utils';
+import { createSecret } from '@libs-private/utils/secretsCaller';
+import { identity } from 'ramda';
 
 const SERVICE_NAME = Services.Settings;
+const LIST_CONNECTION_DEFINITIONS_URL = process.env.CONNECTIONS_API_BASE_URL + 'v1/public/connection-definitions';
+
+type ENVIRONMENT = 'test' | 'live';
 
 export const useSettingsService = (ctx: Context, ownership: Ownership) => {
   const {
@@ -121,13 +122,13 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
           return resultOk(true);
         }
 
-        const setting = generateSettingRecord({
+        const settings = generateSettingsRecord({
           ownership,
-          platform,
+          platforms: [platform],
           features: [],
         });
 
-        await _create<Settings>('st', setting);
+        await _create<Settings>('st', settings);
 
         return resultOk(true);
       } catch (error) {
@@ -141,5 +142,60 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
         );
       }
     },
+
+    // Create a function to create the settings for non oauth platforms
+    async updateNonOauthPlatforms(): Promise<BResult<boolean, 'service', unknown>> {
+      try {
+        const connectionDefinitions = await makeHttpNetworkCall<ConnectionDefinitions>({
+          method: 'GET',
+          url: `${LIST_CONNECTION_DEFINITIONS_URL}?limit=100&skip=0&active=true`,
+        });
+
+        const { data } =
+          matchResultAndHandleHttpError(connectionDefinitions, identity);
+
+        let platforms = [];
+
+        for (const connectionDefinition of data?.rows) {
+          if (!connectionDefinition?.settings?.oauth) {
+            const platform = {
+              connectionDefinitionId: connectionDefinition?._id,
+              type: connectionDefinition?.frontend?.spec?.platform,
+              active: true,
+              activatedAt: new Date().getTime(),
+              image: connectionDefinition?.frontend?.spec?.image,
+              title: connectionDefinition?.frontend?.spec?.title,
+              environment: 'test' as ENVIRONMENT,
+            };
+
+            platforms.push(platform);
+
+          }
+        }
+
+        const settings = generateSettingsRecord({
+          ownership,
+          platforms,
+          features: [],
+        });
+
+        await _create<Settings>('st', settings);
+
+        return resultOk(true);
+
+
+      }
+      catch (error) {
+        return resultErr<'service'>(
+          false,
+          'service_4000',
+          error.message,
+          'buildable-core',
+          typeof error.retryable === 'boolean' ? error.retryable : true,
+          error.data
+        );
+      }
+    },
+
   };
 };

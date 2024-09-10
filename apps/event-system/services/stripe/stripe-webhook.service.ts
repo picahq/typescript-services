@@ -25,9 +25,78 @@ export default {
           endpointSecret
         );
 
+        function analyzeSubscription(subscriptionData: Stripe.SubscriptionItem[]): string {
+          const priceIds = new Set(subscriptionData.map((item) => item.price.id));
+
+          if (priceIds.has(process.env.STRIPE_PRO_PLAN_PRICE_ID) && priceIds.has(process.env.STRIPE_SUPPORT_PLAN_PRICE_ID)) {
+            return 'sub::pro_support';
+          }
+
+          if (priceIds.has(process.env.STRIPE_PRO_PLAN_PRICE_ID)) {
+            return 'sub::pro';
+          }
+
+          if (priceIds.has(process.env.STRIPE_SUPPORT_PLAN_PRICE_ID)) {
+            return 'sub::support';
+          }
+
+          if (priceIds.has(process.env.STRIPE_GROWTH_PLAN_PRICE_ID)) {
+            return 'sub::growth';
+          }
+
+          if (priceIds.has(process.env.STRIPE_RIDICULOUSLY_CHEAP_PLAN_PRICE_ID)) {
+            return 'sub::ridiculous';
+          }
+
+          if (priceIds.has(process.env.STRIPE_FREE_PLAN_PRICE_ID)) {
+            return 'sub::free';
+          }
+
+          return "sub::unknown";
+
+        }
+
         switch (event.type) {
+
+          case 'customer.subscription.created':
+
+          const subscriptionCreated = event.data.object;
+          const key = analyzeSubscription(event.data.object?.items?.data);
+
+          if (key && subscriptionCreated?.status === 'active') {
+            const billing = {
+              provider: 'stripe',
+              customerId: subscriptionCreated?.customer,
+              subscription: {
+                id: subscriptionCreated.id,
+                endDate: subscriptionCreated.current_period_end,
+                valid: true,
+                key,
+              }
+            }
+
+            const client = await ctx.broker.call('v1.clients.updateBillingByCustomerId', {
+              customerId: subscriptionCreated?.customer,
+              billing
+            });
+
+            await ctx.broker.call('v1.tracking.public.track', {
+              path: 't',
+              data: {
+                event: 'Created Subscription',
+                properties: subscriptionCreated,
+                userId: client?.author?._id
+              }
+            });
+
+          }
+
+          break;
+
           case 'customer.subscription.updated':
             const subscriptionUpdated = event.data.object;
+
+            const subscriptionKey = analyzeSubscription(subscriptionUpdated?.items?.data);
 
             const billing = {
               provider: 'stripe',
@@ -36,17 +105,7 @@ export default {
                 id: subscriptionUpdated?.id,
                 endDate: subscriptionUpdated?.current_period_end,
                 valid: true,
-                key:
-                  (subscriptionUpdated as any)?.plan?.id ===
-                  process.env.STRIPE_GROWTH_PLAN_PRICE_ID
-                    ? 'sub::growth'
-                    : (subscriptionUpdated as any)?.plan?.id ===
-                      process.env.STRIPE_RIDICULOUSLY_CHEAP_PLAN_PRICE_ID
-                    ? 'sub::ridiculous'
-                    : (subscriptionUpdated as any)?.plan?.id ===
-                      process.env.STRIPE_FREE_PLAN_PRICE_ID
-                    ? 'sub::free'
-                    : 'sub::unknown',
+                key: subscriptionKey,
               },
             };
 
@@ -72,31 +131,54 @@ export default {
           case 'customer.subscription.deleted':
             const subscriptionDeleted = event.data.object;
 
-            const subscriptionCreated = await stripe.subscriptions.create({
+            const activeSubscriptions = await stripe.subscriptions.list({
               customer: subscriptionDeleted?.customer as string,
-              items: [
-                {
-                  price: process.env.STRIPE_FREE_PLAN_PRICE_ID,
-                },
-              ],
+              status: 'active',
             });
 
-            const updatedBilling = {
-              provider: 'stripe',
-              customerId: subscriptionCreated?.customer,
-              subscription: {
-                id: subscriptionCreated?.id,
-                endDate: subscriptionCreated?.current_period_end,
-                key: 'sub::free',
-                valid: true,
-              },
-            };
+            if (activeSubscriptions?.data?.length === 0) {
+              const subscriptionCreated = await stripe.subscriptions.create({
+                customer: subscriptionDeleted?.customer as string,
+                items: [
+                  {
+                    price: process.env.STRIPE_FREE_PLAN_PRICE_ID,
+                  },
+                ],
+              });
+  
+              const updatedBilling = {
+                provider: 'stripe',
+                customerId: subscriptionCreated?.customer,
+                subscription: {
+                  id: subscriptionCreated?.id,
+                  endDate: subscriptionCreated?.current_period_end,
+                  key: 'sub::free',
+                  valid: true,
+                },
+              };
+  
+              const client = await ctx.broker.call(
+                'v1.clients.updateBillingByCustomerId',
+                {
+                  customerId: subscriptionCreated?.customer,
+                  billing: updatedBilling,
+                }
+              );
+  
+              await ctx.broker.call('v1.tracking.public.track', {
+                path: 't',
+                data: {
+                  event: 'Created Subscription',
+                  properties: subscriptionCreated,
+                  userId: client?.author?._id,
+                },
+              });
+            }
 
             const client = await ctx.broker.call(
-              'v1.clients.updateBillingByCustomerId',
+              'v1.clients.getByCustomerId',
               {
-                customerId: subscriptionCreated?.customer,
-                billing: updatedBilling,
+                customerId: subscriptionDeleted?.customer,
               }
             );
 
@@ -108,16 +190,7 @@ export default {
                 userId: client?.author?._id,
               },
             });
-
-            await ctx.broker.call('v1.tracking.public.track', {
-              path: 't',
-              data: {
-                event: 'Created Subscription',
-                properties: subscriptionCreated,
-                userId: client?.author?._id,
-              },
-            });
-
+      
             break;
 
           case 'invoice.payment_failed':

@@ -23,11 +23,13 @@ export const internalRoute = () => ({
     'v1.stripe.public.createCustomer',
     'v1.stripe.public.getSubscription',
     'v1.stripe.public.getProduct',
+    'v1.stripe.public.listProducts',
     'v1.stripe.public.createBillingPortalSession',
     'v1.stripe.public.listPaymentMethods',
     'v1.stripe.public.listInvoices',
     'v1.clients.get',
     'v1.clients.update',
+    'v1.onboarding.public.init',
   ],
   aliases: {
     'POST v3/users/get': 'v3.users.getUserFromToken',
@@ -53,9 +55,13 @@ export const internalRoute = () => ({
     'POST v1/stripe/create-customer': 'v1.stripe.public.createCustomer',
     'POST v1/stripe/get-subscription': 'v1.stripe.public.getSubscription',
     'POST v1/stripe/get-product': 'v1.stripe.public.getProduct',
+    'POST v1/stripe/list-products': 'v1.stripe.public.listProducts',
     'POST v1/stripe/create-billing-portal-session': 'v1.stripe.public.createBillingPortalSession',
     'POST v1/stripe/list-payment-methods': 'v1.stripe.public.listPaymentMethods',
     'POST v1/stripe/list-invoices': 'v1.stripe.public.listInvoices',
+
+    // Onboarding
+    'POST v1/onboarding/init': 'v1.onboarding.public.init',
 
   },
   cors: {
