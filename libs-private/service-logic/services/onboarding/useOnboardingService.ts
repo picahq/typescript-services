@@ -59,16 +59,6 @@ export const useOnboardingService = (ctx: Context, ownership: Ownership) => {
           }
         });
 
-        // Track subscription creation
-        await ctx.broker.call('v1.tracking.public.track', {
-          path: 't',
-          data: {
-            event: 'Created Subscription',
-            properties: response?.subscription,
-            userId: client?.author?._id
-          }
-        });
-
         return resultOk(true);
       } catch (error) {
         return resultErr<'service'>(
