@@ -34,6 +34,7 @@ export const useOnboardingService = (ctx: Context, ownership: Ownership) => {
         });
 
         const billing = {
+          throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
           customerId: response?.customer?.id,
           subscription: {
             id: response?.subscription?.id,

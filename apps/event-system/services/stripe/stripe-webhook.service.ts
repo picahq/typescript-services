@@ -65,6 +65,7 @@ export default {
 
           if (key && subscriptionCreated?.status === 'active') {
             const billing = {
+              throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
               provider: 'stripe',
               customerId: subscriptionCreated?.customer,
               subscription: {
@@ -99,6 +100,7 @@ export default {
             const subscriptionKey = analyzeSubscription(subscriptionUpdated?.items?.data);
 
             const billing = {
+              throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
               provider: 'stripe',
               customerId: subscriptionUpdated?.customer,
               subscription: {
@@ -147,6 +149,7 @@ export default {
               });
   
               const updatedBilling = {
+                throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
                 provider: 'stripe',
                 customerId: subscriptionCreated?.customer,
                 subscription: {
