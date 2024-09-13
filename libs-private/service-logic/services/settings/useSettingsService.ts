@@ -10,6 +10,7 @@ import {
   LinkSettings as Settings,
   Feature,
 } from '@event-inc/types/settings';
+import EventAccess from '@apps/event-system/services/events/event-access.service';
 import { BResult, ConnectionDefinitions } from '@event-inc/types';
 import { generateSettingsRecord } from '@libs-private/service-logic/generators/settings/linkSettings';
 import { resultOk, resultErr, makeHttpNetworkCall, matchResultAndHandleHttpError } from '@event-inc/utils';
@@ -28,6 +29,15 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
     find,
     updateById,
   } = useGenericCRUDService(ctx, SERVICE_NAME, ownership);
+
+  const { find: findEventAccess } = useGenericCRUDService(
+    ctx,
+    Services.EventAccess,
+    ownership,
+    {
+      DISABLE_ADDING_OWNERSHIP_CHECK: true,
+    }
+  );
 
   return {
     find,
@@ -59,10 +69,19 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
       try {
         const settingsRecord = (await _list()).unwrap().rows[0] as Settings;
 
+        const eventAccessRecordResult = await findEventAccess<EventAccess>({
+          query: {
+            "ownership.buildableId": ownership.buildableId,
+            "key": `event_access::custom::${platform.environment}::default::event-inc::internal-ui`
+          },
+        });
+
+        const eventAccessRecord = eventAccessRecordResult.unwrap()?.[0];
+
         if (configuration) {
           const secretsRecord = await createSecret(
             JSON.stringify(configuration),
-            ownership.buildableId
+            eventAccessRecord?.accessKey
           );
 
           platform.secretsServiceId = secretsRecord._id;
@@ -133,7 +152,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
         });
 
         const { data } =
-        matchResultAndHandleHttpError(connectionDefinitions, identity);
+          matchResultAndHandleHttpError(connectionDefinitions, identity);
 
         let platforms = [];
 
@@ -163,7 +182,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
         await _create<Settings>('st', settings);
 
         return resultOk(true);
-       
+
 
       }
       catch (error) {

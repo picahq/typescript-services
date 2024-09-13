@@ -14,14 +14,16 @@ interface CreateSecretResponse {
 
 export const createSecret = async (
   secret: string,
-  buildableId: string
+  eventAccessKey: string
 ): Promise<CreateSecretResponse> => {
   const results = await makeHttpNetworkCall<CreateSecretResponse>({
-    url: process.env.SECRETS_SERVICE_BASE_URL + 'v1/secrets/create',
+    url: process.env.SECRETS_SERVICE_BASE_URL + 'v1/secrets',
     method: 'POST',
+    headers: {
+      "x-integrationos-secret": eventAccessKey
+    },
     data: {
-      secret,
-      buildableId,
+      secret
     },
   });
 
@@ -42,15 +44,14 @@ interface GetSecretResponse {
 
 export const getSecret = async (
   secretsServiceId: string,
-  buildableId: string
+  eventAccessKey: string
 ): Promise<GetSecretResponse> => {
   const results = await makeHttpNetworkCall<GetSecretResponse>({
-    url: process.env.SECRETS_SERVICE_BASE_URL + 'v1/secrets/get',
+    url: process.env.SECRETS_SERVICE_BASE_URL + `v1/secrets/${secretsServiceId}`,
     method: 'POST',
-    data: {
-      id: secretsServiceId,
-      buildableId,
-    },
+    headers: {
+      "x-integrationos-secret": eventAccessKey
+    }
   });
 
   const matchedResult = matchResultAndHandleHttpError(results, identity);
