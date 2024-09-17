@@ -80,7 +80,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
 
         if (configuration) {
           const secretsRecord = await createSecret(
-            JSON.stringify(configuration),
+            configuration,
             eventAccessRecord?.accessKey
           );
 
