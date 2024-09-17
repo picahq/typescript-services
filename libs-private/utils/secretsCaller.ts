@@ -13,7 +13,7 @@ interface CreateSecretResponse {
 }
 
 export const createSecret = async (
-  secret: string,
+  secret: object,
   eventAccessKey: string
 ): Promise<CreateSecretResponse> => {
   const results = await makeHttpNetworkCall<CreateSecretResponse>({
