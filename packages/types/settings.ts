@@ -3,6 +3,7 @@ import { Ownership } from './generic';
 export interface Platform {
   type: string;
   scopes?: string;
+  connectionGuide?: string;
   title: string;
   connectionDefinitionId: string;
   active: boolean;
