@@ -17,8 +17,6 @@ export interface EventLink {
   _id?: string;
   version: string;
   ownership: Ownership;
-  label?: string;
-  group?: string;
   identity?: string;
   identityType?: 'user' | 'team' | 'organization';
   token: string;
