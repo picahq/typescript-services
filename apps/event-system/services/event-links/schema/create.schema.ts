@@ -4,9 +4,11 @@ export const createLinkSchema = {
   ...createSchema,
   label: {
     type: 'string',
+    optional: true,
   },
   group: {
     type: 'string',
+    optional: true,
   },
   ttl: {
     type: 'number',

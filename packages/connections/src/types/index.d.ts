@@ -17,8 +17,10 @@ export interface EventLink {
   _id?: string;
   version: string;
   ownership: Ownership;
-  label: string;
-  group: string;
+  label?: string;
+  group?: string;
+  identity?: string;
+  identityType?: 'user' | 'team' | 'organization';
   token: string;
   createdAt: number;
   createdDate: Date;
@@ -31,11 +33,11 @@ export interface EventLink {
 
 export type CreateEventLinkPayload = {
   version?: string;
-  label?: string;
-  group: string;
   ttl?: number;
   environment?: string;
   usageSource?: string;
+  identity?: string;
+  identityType?: 'user' | 'team' | 'organization';
 };
 
 export interface ConnectionDefinition {

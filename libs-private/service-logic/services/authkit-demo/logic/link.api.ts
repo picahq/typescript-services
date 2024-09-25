@@ -82,8 +82,6 @@ export const createEventLinkTokenApi = async (
       connectedPlatforms: connectedPlatformsFiltered ?? [],
       eventIncToken: linkData?.token,
     },
-    group: linkData?.group,
-    label: linkData?.label,
     environment: isLiveSecret ? 'live' : 'test',
     expiresAt: new Date().getTime() + 5 * 1000 * 60,
     sessionId,

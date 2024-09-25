@@ -49,6 +49,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
     async create({
       label,
       group,
+      identity,
+      identityType,
       ttl = 2 * 1000 * 60 * 60,
       environment = 'live',
       usageSource,
@@ -62,6 +64,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         ownership,
         environment,
         usageSource,
+        identity,
+        identityType,
       });
 
       return await _create<EventLink>('ln', link);
@@ -122,21 +126,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           identity
         );
 
-        // Get the connection definition by id
-        const connectionDefinitions =
-          await makeHttpNetworkCall<ConnectionDefinitions>({
-            url: `${LIST_CONNECTION_DEFINITIONS_URL}?limit=100&skip=0&active=true`,
-            method: 'GET',
-          });
-        const { data } = matchResultAndHandleHttpError(
-          connectionDefinitions,
-          identity
-        );
-
-        const connectionDefinition = data?.rows?.find(
-          (row) => row?._id === connectionDefinitionId
-        );
-
         const connection = await makeHttpNetworkCall<ConnectionRecord>({
           url: CREATE_CONNECTION_URL,
           method: 'POST',
@@ -148,19 +137,9 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           data: {
             active: true,
             connectionDefinitionId,
-            name: authFormData['NAME']
-              ? authFormData['NAME']
-              : link?.usageSource === 'user-dashboard'
-              ? `${connectionDefinition?.frontend?.spec?.title} sandbox account`
-              : link?.label,
             authFormData,
-            group: authFormData['NAME']
-              ? `${_.replace(
-                  authFormData['NAME'],
-                  /[^a-zA-Z0-9_]/g,
-                  '-'
-                ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
-              : link?.group,
+            identity: link?.identity,
+            identityType: link?.identityType,
           },
         });
 
@@ -244,21 +223,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           identity
         );
 
-        // Get the connection definition by id
-        const connectionDefinitions =
-          await makeHttpNetworkCall<ConnectionDefinitions>({
-            url: `${LIST_CONNECTION_DEFINITIONS_URL}?limit=100&skip=0&active=true`,
-            method: 'GET',
-          });
-        const { data } = matchResultAndHandleHttpError(
-          connectionDefinitions,
-          identity
-        );
-
-        const connectionDefinition = data?.rows?.find(
-          (row) => row?._id === connectionDefinitionId
-        );
-
         let secret = headers['x-integrationos-secret'];
 
         if (!secret || secret === 'redacted') {
@@ -283,18 +247,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
             },
             type,
             connectionDefinitionId,
-            label: formData?.['NAME']
-              ? formData?.['NAME']
-              : link?.usageSource === 'user-dashboard'
-              ? `${connectionDefinition?.frontend?.spec?.title} sandbox account`
-              : link?.label,
-            group: formData?.['NAME']
-              ? `${_.replace(
-                  formData?.['NAME'] as string,
-                  /[^a-zA-Z0-9_]/g,
-                  '-'
-                ).toLowerCase()}-${uuidv4().replace(/-/g, '').substring(0, 10)}`
-              : link?.group,
+            identity: link?.identity,
+            identityType: link?.identityType,
           },
         });
 
@@ -470,8 +424,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
 
       // Generate a link record
       const link = await generateEventLinkRecord({
-        label: 'My Connection',
-        group: `connection-${uuidv4().replace(/-/g, '').substring(0, 10)}`,
         ttl: 2 * 1000 * 60 * 60,
         ownership: records?.rows?.[0]?.ownership,
         environment: 'test',
@@ -522,8 +474,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           connectedPlatforms: connectedPlatforms ?? [],
           eventIncToken: linkToken?.token,
         },
-        group: linkToken?.group,
-        label: linkToken?.label,
         ttl: 5 * 60 * 1000,
         environment: 'test',
         features: settings?.features,

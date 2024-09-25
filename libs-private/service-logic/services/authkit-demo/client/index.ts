@@ -34,7 +34,7 @@ export class EmbedToken {
   async create(payload: {
     version?: string;
     label?: string;
-    group: string;
+    group?: string;
     ttl?: number;
   }) {
     const secret = this._clientInfo.secret;
