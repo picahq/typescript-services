@@ -47,8 +47,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
 
   return {
     async create({
-      label,
-      group,
       identity,
       identityType,
       ttl = 2 * 1000 * 60 * 60,
@@ -58,8 +56,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       BResult<EventLink, 'service', unknown>
     > {
       const link = await generateEventLinkRecord({
-        label,
-        group,
         ttl,
         ownership,
         environment,
@@ -303,8 +299,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
 
       // Generate a link record
       const link = await generateEventLinkRecord({
-        label: 'My Connection',
-        group: `connection-${uuidv4().replace(/-/g, '').substring(0, 10)}`,
         ttl: 2 * 1000 * 60 * 60,
         ownership: records?.rows?.[0]?.ownership,
         environment: headers['x-integrationos-secret'].startsWith('sk_test')
@@ -357,8 +351,6 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           connectedPlatforms: connectedPlatforms ?? [],
           eventIncToken: linkToken?.token,
         },
-        group: linkToken?.group,
-        label: linkToken?.label,
         ttl: 5 * 60 * 1000,
         environment: headers['x-integrationos-secret'].startsWith('sk_test')
           ? 'test'

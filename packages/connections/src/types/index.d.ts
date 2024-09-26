@@ -155,8 +155,6 @@ export interface EmbedTokenRecord {
     connectedPlatforms: Platform[];
     eventIncToken: string;
   };
-  label: string;
-  group: string;
   createdAt: number;
   createdDate: Date;
   updatedAt?: number;
