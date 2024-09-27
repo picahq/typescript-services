@@ -33,7 +33,6 @@ export class AuthKitToken {
   }
 
   async create(payload: {
-    version?: string;
     ttl?: number;
     identity?: string;
     identityType?: "user" | "team" | "organization";
