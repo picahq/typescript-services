@@ -14,10 +14,6 @@ export const useAuthkitDemoService = () => {
       );
       try {
         const token = await embedToken.create({
-          group: `authkit-demo-group-${uuidv4()
-            .replace(/-/g, '')
-            .substring(0, 10)}`,
-          label: 'Demo connection',
           ttl: 2 * 1000 * 60 * 60,
         });
 

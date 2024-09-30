@@ -33,10 +33,9 @@ export class AuthKitToken {
   }
 
   async create(payload: {
-    version?: string;
-    label?: string;
-    group: string;
     ttl?: number;
+    identity?: string;
+    identityType?: "user" | "team" | "organization";
   }) {
     const secret = this._clientInfo.secret;
     const url = this._url;

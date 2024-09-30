@@ -4,8 +4,8 @@ import { generateId } from '@libs-private/utils';
 
 export const generateEventLinkRecord = async ({
   version = '1.0.0_04.44_18-04-2023T10-33-00',
-  label,
-  group,
+  identity,
+  identityType,
   ttl,
   ownership,
   environment,
@@ -19,8 +19,8 @@ export const generateEventLinkRecord = async ({
     _type: 'event-link',
     version,
     ownership,
-    label,
-    group,
+    identity,
+    identityType,
     token: tokenId,
     createdAt: Date.now(),
     createdDate: new Date(),
