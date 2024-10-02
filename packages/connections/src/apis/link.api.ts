@@ -88,6 +88,8 @@ export const createEventLinkTokenApi = async (
       },
       identity: link?.data?.identity,
       identityType: link?.data?.identityType,
+      group: link?.data?.group,
+      label: link?.data?.label,
       environment: secret.startsWith('sk_test') ? 'test' : 'live',
       expiresAt: new Date().getTime() + 5 * 1000 * 60,
       sessionId,

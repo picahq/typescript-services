@@ -19,6 +19,8 @@ export interface EventLink {
   ownership: Ownership;
   identity?: string;
   identityType?: 'user' | 'team' | 'organization';
+  group?: string;
+  label?: string;
   token: string;
   createdAt: number;
   createdDate: Date;
@@ -36,6 +38,8 @@ export type CreateEventLinkPayload = {
   usageSource?: string;
   identity?: string;
   identityType?: 'user' | 'team' | 'organization';
+  group?: string;
+  label?: string;
 };
 
 export interface ConnectionDefinition {
@@ -155,6 +159,10 @@ export interface EmbedTokenRecord {
     connectedPlatforms: Platform[];
     eventIncToken: string;
   };
+  group?: string;
+  label?: string;
+  identity?: string;
+  identityType?: 'user' | 'team' | 'organization';
   createdAt: number;
   createdDate: Date;
   updatedAt?: number;

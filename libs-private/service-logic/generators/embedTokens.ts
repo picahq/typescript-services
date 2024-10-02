@@ -5,6 +5,8 @@ import {
 import { generateId } from '../service-helper';
 
 export const generateEmbedTokensRecord = async ({
+  label,
+  group,
   ttl,
   linkSettings,
   environment,
@@ -20,5 +22,7 @@ export const generateEmbedTokensRecord = async ({
     environment,
     sessionId,
     features,
+    label,
+    group,
   };
 };
