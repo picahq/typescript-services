@@ -11,6 +11,8 @@ export type CreateEventLinkPayload = {
   usageSource?: string;
   identity?: string;
   identityType?: 'user' | 'team' | 'organization';
+  group?: string;
+  label?: string;
 };
 
 export interface EventLink {
@@ -19,6 +21,8 @@ export interface EventLink {
   ownership: Ownership;
   identity?: string;
   identityType?: 'user' | 'team' | 'organization';
+  group?: string;
+  label?: string;
   token: string;
   createdAt: number;
   createdDate: Date;

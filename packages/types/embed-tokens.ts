@@ -24,6 +24,8 @@ export interface EmbedTokensPayload {
     connectedPlatforms: Platform[];
     eventIncToken: string;
   };
+  label?: string;
+  group?: string;
   identity?: string;
   identityType?: 'user' | 'team' | 'organization';
   environment: string;
@@ -40,6 +42,8 @@ export interface EmbedTokenRecord {
   features?: Feature[];
   identity?: string;
   identityType?: 'user' | 'team' | 'organization';
+  label?: string;
+  group?: string;
   createdAt: number;
   createdDate: Date;
   updatedAt?: number;

@@ -36,6 +36,10 @@ export class AuthKitToken {
     ttl?: number;
     identity?: string;
     identityType?: "user" | "team" | "organization";
+     /** @deprecated Use 'identity' instead */
+    group?: string;
+     /** @deprecated */
+    label?: string;
   }) {
     const secret = this._clientInfo.secret;
     const url = this._url;

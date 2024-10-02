@@ -49,6 +49,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
     async create({
       identity,
       identityType,
+      group,
+      label,
       ttl = 2 * 1000 * 60 * 60,
       environment = 'live',
       usageSource,
@@ -62,6 +64,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         usageSource,
         identity,
         identityType,
+        group,
+        label,
       });
 
       return await _create<EventLink>('ln', link);
@@ -136,6 +140,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
             authFormData,
             identity: link?.identity,
             identityType: link?.identityType,
+            name: link?.label,
+            group: link?.group,
           },
         });
 
@@ -245,6 +251,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
             connectionDefinitionId,
             identity: link?.identity,
             identityType: link?.identityType,
+            name: link?.label,
+            group: link?.group,
           },
         });
 
