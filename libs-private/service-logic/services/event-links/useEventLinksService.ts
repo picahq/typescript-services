@@ -251,7 +251,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
             connectionDefinitionId,
             identity: link?.identity,
             identityType: link?.identityType,
-            label: link?.label,
+            name: link?.label,
             group: link?.group,
           },
         });
