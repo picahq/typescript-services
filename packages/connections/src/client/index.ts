@@ -34,6 +34,10 @@ export class AuthKitToken {
 
   async create(payload: {
     ttl?: number;
+    /**
+     * Unique identifier for the token.
+     * @remarks It is recommended to avoid using spaces and colons in this field as it may lead to unexpected behavior in some systems.
+     */
     identity?: string;
     identityType?: "user" | "team" | "organization";
      /** @deprecated Use 'identity' instead */
