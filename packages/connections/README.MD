@@ -25,11 +25,7 @@ import { AuthKitToken } from "@integrationos/authkit-node";
 
 app.post("/authkit-token", async (request, response) => {
   const authKitToken = new AuthKitToken("sk_live_1234");
-
-  const token = await authKitToken.create({
-    identity: "org_123", // an optional meaningful identifier (i.e., organizationId)
-    identityType: "organization" // an optional identity type
-  });
+  const token = await authKitToken.create();
 
   response.send(token);
 });
