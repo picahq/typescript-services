@@ -28,8 +28,8 @@ export const generateId = async (prefix: string) => {
 export const createEventLinkTokenApi = async (
   headers: Record<string, string>,
   url: string,
-  payload: CreateEventLinkPayload,
-  secret: string
+  secret: string,
+  payload?: CreateEventLinkPayload,
 ) => {
   try {
     const settings = await axios.post<LinkSettings>(

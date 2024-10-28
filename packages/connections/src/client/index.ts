@@ -32,7 +32,7 @@ export class AuthKitToken {
     return 'https://api.integrationos.com/internal';
   }
 
-  async create(payload: {
+  async create(payload?: {
     ttl?: number;
     /**
      * Unique identifier for the token.
@@ -49,7 +49,7 @@ export class AuthKitToken {
     const url = this._url;
     const headers = getHeaders(secret);
 
-    const result = await createEventLinkTokenApi(headers, url, payload, secret);
+    const result = await createEventLinkTokenApi(headers, url, secret, payload);
     return result;
   }
 }
