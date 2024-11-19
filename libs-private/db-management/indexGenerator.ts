@@ -176,6 +176,10 @@ const collectionsWithIndexes: Record<string, IndexSpecification[]> = {
       expireAfterSeconds: 60 * 5, // 5 Minutes
     },
   ],
+  'archives': [
+    { field: { reference: 1, type: 1 }, name: 'reference_1_type_1' },
+    { field: { type: 1, endsAt: -1 }, name: 'type_1_endsAt_1' },
+  ]
 };
 
 export const createIndexes = async (db: Db) => {
