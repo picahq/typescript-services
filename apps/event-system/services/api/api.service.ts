@@ -108,7 +108,7 @@ module.exports = {
               email: decodedToken.email,
             };
           }
-          if (adminUrls.some((url) => req.headers.origin.includes(url))) {
+          if (adminUrls.some((url) => req.headers.origin?.includes(url))) {
             ctx.meta.isAdmin = true;
           }
         },

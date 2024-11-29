@@ -11,6 +11,7 @@ export const internalRoute = () => ({
   whitelist: [
     'v3.users.getUserFromToken',
     'v3.users.updateUserFromToken',
+    'v3.users.deleteUserFromToken',
 
     'v1.event-links.public.create',
     'v1.event-links.public.createUserDashboardEmbedLinkToken',
@@ -40,6 +41,7 @@ export const internalRoute = () => ({
 
     'POST v3/users/update': 'v3.users.updateUserFromToken',
     'GET v3/users/update': 'v3.users.updateUserFromToken',
+    'POST v3/users/delete': 'v3.users.deleteUserFromToken',
 
     // Links
     'POST v1/embed-tokens/create': 'v1.embed-tokens.public.create',
