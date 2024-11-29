@@ -157,6 +157,29 @@ module.exports = {
         return pick(result, this.schema.publicFields);
       },
     },
+    deleteUserFromToken: {
+      async handler(ctx: any) {
+        try {
+          const userId = get(ctx, 'meta.user._id');
+          await ctx.broker.call(
+            `v${this.version}.${this.name}.remove`,
+            {
+              id: userId
+            },
+            { meta: ctx.meta }
+          );
+
+          return {
+            message: 'User deleted successfully'
+          };
+
+        }
+        catch (error) {
+          console.error(error);
+          throw new SomethingWentWrong();
+        }
+      }
+    },
     updateUserFromToken: {
       params: {
         firstName: {
