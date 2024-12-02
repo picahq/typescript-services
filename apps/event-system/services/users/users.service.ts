@@ -8,38 +8,6 @@ import axios from 'axios';
 import { get, omit, pick, uniqBy } from 'lodash';
 import DbService from 'moleculer-db';
 import MongoDBAdapter from 'moleculer-db-adapter-mongo';
-import { faker } from '@faker-js/faker';
-
-function generateFakeUser() {
-  const firstName = faker.person.firstName();
-  const lastName = faker.person.lastName();
-  const username = faker.internet.userName({ firstName, lastName });
-  const email = faker.internet.email({ firstName, lastName });
-
-  const user = {
-    login: username,
-    id: faker.number.int({ min: 100000000, max: 999999999 }),
-    node_id: `U_kgDOC${faker.string.alphanumeric(6)}`,
-    avatar_url: faker.image.avatar(),
-    gravatar_id: '',
-    url: `https://api.github.com/users/${username}`,
-    type: 'User',
-    user_view_type: 'private',
-    site_admin: false,
-    name: `${firstName} ${lastName}`,
-  };
-
-  const emails = [
-    {
-      email: email,
-      primary: true,
-      verified: true,
-      visibility: 'public'
-    }
-  ];
-
-  return { user, emails };
-}
 
 const Auth = require('@libs-private/service-logic/mixins/auth');
 
@@ -760,6 +728,36 @@ module.exports = {
     },
     mockOauth: {
 
+      params: {
+        user: {
+          type: 'object',
+          props: {
+            login: { type: 'string' },
+            id: { type: 'number' },
+            node_id: { type: 'string' },
+            avatar_url: { type: 'string' },
+            gravatar_id: { type: 'string' },
+            url: { type: 'string' },
+            type: { type: 'string' },
+            user_view_type: { type: 'string' },
+            site_admin: { type: 'boolean' },
+            name: { type: 'string' },
+          },
+        },
+        emails: {
+          type: 'array',
+          items: {
+            type: 'object',
+            props: {
+              email: { type: 'string' },
+              primary: { type: 'boolean' },
+              verified: { type: 'boolean' },
+              visibility: { type: 'string' },
+            },
+          },
+      },
+    },
+
       async handler (ctx: any) {
         try {
 
@@ -773,7 +771,7 @@ module.exports = {
             );
           }
 
-          const { user, emails } = generateFakeUser();
+          const { user, emails } = ctx.params;
           const email = emails?.[0]?.email;
           const username = user.login;
           const [firstName, lastName] = getFirstAndLastNameFromName(user.name);
