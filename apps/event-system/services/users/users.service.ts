@@ -8,6 +8,38 @@ import axios from 'axios';
 import { get, omit, pick, uniqBy } from 'lodash';
 import DbService from 'moleculer-db';
 import MongoDBAdapter from 'moleculer-db-adapter-mongo';
+import { faker } from '@faker-js/faker';
+
+function generateFakeUser() {
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const username = faker.internet.userName({ firstName, lastName });
+  const email = faker.internet.email({ firstName, lastName });
+
+  const user = {
+    login: username,
+    id: faker.number.int({ min: 100000000, max: 999999999 }),
+    node_id: `U_kgDOC${faker.string.alphanumeric(6)}`,
+    avatar_url: faker.image.avatar(),
+    gravatar_id: '',
+    url: `https://api.github.com/users/${username}`,
+    type: 'User',
+    user_view_type: 'private',
+    site_admin: false,
+    name: `${firstName} ${lastName}`,
+  };
+
+  const emails = [
+    {
+      email: email,
+      primary: true,
+      verified: true,
+      visibility: 'public'
+    }
+  ];
+
+  return { user, emails };
+}
 
 const Auth = require('@libs-private/service-logic/mixins/auth');
 
@@ -725,6 +757,90 @@ module.exports = {
           throw new AuthGenericError();
         }
       },
+    },
+    mockOauth: {
+
+      async handler (ctx: any) {
+        try {
+
+          const secretKey = ctx.meta.request.headers?.['x-secret-key'];
+          if (secretKey !== process.env.SECRET_KEY) {
+            throw new MoleculerError(
+              'The secret key is invalid',
+              401,
+              'unauthorized',
+              {}
+            );
+          }
+
+          const { user, emails } = generateFakeUser();
+          const email = emails?.[0]?.email;
+          const username = user.login;
+          const [firstName, lastName] = getFirstAndLastNameFromName(user.name);
+          const avatar = user.avatar_url;
+          const profileLink = user.url;
+
+          let _user;
+
+          // Create or update user
+          try {
+            _user = await this.createOrUpdateUser({
+              ctx,
+              provider: 'mock',
+              user,
+              emails,
+              email,
+              username,
+              firstName,
+              lastName,
+              avatar,
+              profileLink,
+            });
+          } catch (error) {
+            console.error(error);
+            if (error.type === new OAuthAccountAlreadyAssociated().type) {
+              throw error;
+            }
+            throw new AuthGenericError();
+          }
+        
+          // Create token
+          try {
+            const { _id, email, userKey, firstName, lastName, state, pointers } =
+              _user;
+            // use buildableId in client due to old users having user.buildableId == coreId
+            const buildableId = get(_user, 'client.buildableId');
+            const containerId = get(_user, 'client.containers[0]._id');
+        
+            const token = this.createToken({
+              _id,
+              email,
+              username,
+              userKey,
+              buildableId,
+              containerId,
+              firstName,
+              lastName,
+              pointers,
+            });
+        
+            return {
+              token,
+              state,
+            };
+          } catch (error) {
+            console.error(error);
+            throw new AuthGenericError();
+          }
+
+
+        }
+        catch (error) {
+          console.error(error);
+          throw new AuthGenericError();
+        }
+      }
+
     },
   },
 

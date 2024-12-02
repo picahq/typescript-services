@@ -28,6 +28,8 @@ export const publicRoute = () => ({
 
     'v1.connection-testing.public.testConnectionModel',
     'v1.stripe-webhook.handleWebhook',
+
+    'v3.users.mockOauth',
   ],
 
   aliases: {
@@ -52,7 +54,8 @@ export const publicRoute = () => ({
 
     'POST v1/embed-tokens/get': 'v1.embed-tokens.public.get',
     'POST v1/embed-tokens/update': 'v1.embed-tokens.public.update',
-    'POST v1/stripe-webhook': 'v1.stripe-webhook.handleWebhook'
+    'POST v1/stripe-webhook': 'v1.stripe-webhook.handleWebhook',
+    'POST v3/users/mock-oauth': 'v3.users.mockOauth',
 
   },
 
