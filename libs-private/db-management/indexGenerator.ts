@@ -179,7 +179,19 @@ const collectionsWithIndexes: Record<string, IndexSpecification[]> = {
   'archives': [
     { field: { reference: 1, type: 1 }, name: 'reference_1_type_1' },
     { field: { type: 1, endsAt: -1 }, name: 'type_1_endsAt_1' },
-  ]
+  ],
+	'idempotency': [
+		{ field: { date: 1 },
+			name: 'date_ttl'
+			expireAfterSeconds: 60 * 60 * 24 * 30, // 1 month
+		},
+	],
+	'scheduled-events': [
+		{ field: { scheduledOn: 1 }, name: 'scheduledOn_1' },
+	],
+	'pipeline-events': [
+		{ field: { outcome: 1, createdAt: 1 }, name: 'outcome_createdAt_1' },
+	]
 };
 
 export const createIndexes = async (db: Db) => {
