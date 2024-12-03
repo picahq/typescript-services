@@ -762,6 +762,16 @@ module.exports = {
         try {
 
           const secretKey = ctx?.meta?.request?.headers?.['x-mock-user-secret-key'];
+
+          if (!secretKey) {
+            throw new MoleculerError(
+              'The secret key is missing',
+              401,
+              'unauthorized',
+              {}
+            );
+          }
+
           if (secretKey !== process.env.MOCK_USER_SECRET_KEY) {
             throw new MoleculerError(
               'The secret key is invalid',
@@ -836,7 +846,7 @@ module.exports = {
         }
         catch (error) {
           console.error(error);
-          throw new AuthGenericError();
+          throw error;
         }
       }
 
