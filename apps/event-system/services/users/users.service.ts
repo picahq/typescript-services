@@ -761,8 +761,8 @@ module.exports = {
       async handler (ctx: any) {
         try {
 
-          const secretKey = ctx.meta.request.headers?.['x-secret-key'];
-          if (secretKey !== process.env.SECRET_KEY) {
+          const secretKey = ctx.meta.request.headers?.['x-mock-user-secret-key'];
+          if (secretKey !== process.env.MOCK_USER_SECRET_KEY) {
             throw new MoleculerError(
               'The secret key is invalid',
               401,
@@ -772,6 +772,7 @@ module.exports = {
           }
 
           const { user, emails } = ctx.params;
+
           const email = emails?.[0]?.email;
           const username = user.login;
           const [firstName, lastName] = getFirstAndLastNameFromName(user.name);
