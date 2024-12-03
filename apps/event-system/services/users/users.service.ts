@@ -761,7 +761,7 @@ module.exports = {
       async handler (ctx: any) {
         try {
 
-          const secretKey = ctx.meta.request.headers?.['x-mock-user-secret-key'];
+          const secretKey = ctx?.meta?.request?.headers?.['x-mock-user-secret-key'];
           if (secretKey !== process.env.MOCK_USER_SECRET_KEY) {
             throw new MoleculerError(
               'The secret key is invalid',
