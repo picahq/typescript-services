@@ -1,4 +1,4 @@
-import { Db } from 'mongodb';
+import { Db } from "mongodb";
 
 interface IndexSpecification {
   field: Record<string, number>;
@@ -21,177 +21,184 @@ interface CollationOptions {
 }
 
 const collectionsWithIndexes: Record<string, IndexSpecification[]> = {
-  'common-models': [
-    { field: { name: 1 }, unique: true, name: 'name_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+  "common-models": [
+    { field: { name: 1 }, unique: true, name: "name_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'connection-definitions': [
-    { field: { key: 1 }, unique: true, name: 'key_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+  "connection-definitions": [
+    { field: { key: 1 }, unique: true, name: "key_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'connection-model-definitions': [
-    { field: { key: 1 }, unique: true, name: 'key_1' },
+  "connection-model-definitions": [
+    { field: { key: 1 }, unique: true, name: "key_1" },
     {
       field: { connectionPlatform: 1, action: 1, modelName: 1 },
-      name: 'connectionPlatform_1_action_1_modelName_1',
+      name: "connectionPlatform_1_action_1_modelName_1",
     },
-    { field: { connectionPlatform: 1 }, name: 'connectionPlatform_1' },
-    { field: { actionName: 1 }, name: 'actionName_1' },
+    { field: { connectionPlatform: 1 }, name: "connectionPlatform_1" },
+    { field: { actionName: 1 }, name: "actionName_1" },
     {
-      field: { 'mapping.commonModelName': 1 },
-      collation: { locale: 'en', strength: 2 },
-      name: 'connectionPlatform_1',
+      field: { "mapping.commonModelName": 1 },
+      collation: { locale: "en", strength: 2 },
+      name: "connectionPlatform_1",
     },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'connection-oauth-definitions': [
-    { field: { connectionPlatform: 1 }, name: 'connectionPlatform_2' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+  "connection-oauth-definitions": [
+    { field: { connectionPlatform: 1 }, name: "connectionPlatform_2" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'connection-model-schema': [
-    { field: { key: 1 }, unique: true, name: 'key_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+  "connection-model-schema": [
+    { field: { key: 1 }, unique: true, name: "key_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
   connections: [
     {
-      field: { key: 1, 'ownership.clientId': 1 },
+      field: { key: 1, "ownership.clientId": 1 },
       unique: true,
-      name: 'key_1_ownership.clientId_1',
+      name: "key_1_ownership.clientId_1",
       partialFilterExpression: { deleted: false },
     },
-    { field: { 'ownership.clientId': 1 }, name: 'ownership.clientId_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { "ownership.clientId": 1 }, name: "ownership.clientId_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'event-access': [
+  "event-access": [
     {
-      field: { key: 1, 'ownership.clientId': 1 },
+      field: { key: 1, "ownership.clientId": 1 },
       unique: true,
-      name: 'key_1_ownership.clientId_1',
+      name: "key_1_ownership.clientId_1",
     },
-    { field: { 'ownership.clientId': 1 }, name: 'ownership.clientId_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { "ownership.clientId": 1 }, name: "ownership.clientId_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'event-transactions': [
+  "event-transactions": [
     {
-      field: { txKey: 1, 'ownership.clientId': 1 },
+      field: { txKey: 1, "ownership.clientId": 1 },
       unique: true,
-      name: 'txKey_1_ownership.clientId_1',
+      name: "txKey_1_ownership.clientId_1",
     },
-    { field: { eventKey: 1 }, name: 'eventKey_1' },
-    { field: { 'ownership.clientId': 1 }, name: 'ownership.clientId_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { eventKey: 1 }, name: "eventKey_1" },
+    { field: { "ownership.clientId": 1 }, name: "ownership.clientId_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'external-events': [
-    { field: { eventName: 1 }, name: 'eventName_1' },
-    { field: { eventKey: 1 }, name: 'eventKey_1' },
-    { field: { topic: 1 }, name: 'topic_1' },
-    { field: { 'ownership.buildableId': 1 }, name: 'ownership.buildableId_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { environment: 1 }, name: 'environment_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
-    { field: { state: 1, createdAt: 1 }, name: 'state_and_createdAt_1' },
-    { field: { environment: 1, createdAt: 1, deleted: 1, "ownership.buildableId": 1 }, name: 'logs_1' },
+  "external-events": [
+    { field: { eventName: 1 }, name: "eventName_1" },
+    { field: { eventKey: 1 }, name: "eventKey_1" },
+    { field: { topic: 1 }, name: "topic_1" },
+    { field: { "ownership.buildableId": 1 }, name: "ownership.buildableId_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { environment: 1 }, name: "environment_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
+    { field: { state: 1, createdAt: 1 }, name: "state_and_createdAt_1" },
+    {
+      field: {
+        environment: 1,
+        createdAt: 1,
+        deleted: 1,
+        "ownership.buildableId": 1,
+      },
+      name: "logs_1",
+    },
   ],
   jobs: [
-    { field: { jobType: 1 }, name: 'jobType_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { jobType: 1 }, name: "jobType_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
   links: [
-    { field: { token: 1 }, unique: true, name: 'token_1' },
-    { field: { 'ownership.clientId': 1 }, name: 'ownership.clientId_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { token: 1 }, unique: true, name: "token_1" },
+    { field: { "ownership.clientId": 1 }, name: "ownership.clientId_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'platform-pages': [
+  "platform-pages": [
     {
       field: { platformName: 1, modelName: 1 },
-      name: 'platformName_1_modelName_1',
+      name: "platformName_1_modelName_1",
     },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
   secrets: [
-    { field: { buildableId: 1, _id: 1 }, name: 'buildableId_1__id_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { buildableId: 1, _id: 1 }, name: "buildableId_1__id_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
   sessions: [
-    { field: { 'ownership.clientId': 1 }, name: 'ownership.clientId_1' },
-    { field: { token: 1 }, name: 'token_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { "ownership.clientId": 1 }, name: "ownership.clientId_1" },
+    { field: { token: 1 }, name: "token_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
   settings: [
-    { field: { 'ownership.clientId': 1 }, name: 'ownership.clientId_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { "ownership.clientId": 1 }, name: "ownership.clientId_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
   stages: [
-    { field: { jobId: 1 }, name: 'jobId_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { jobId: 1 }, name: "jobId_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'system-stats': [
-    { field: { clientId: 1 }, name: 'clientId_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+  "system-stats": [
+    { field: { clientId: 1 }, name: "clientId_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
   users: [
-    { field: { email: 1 }, unique: true, name: 'email_1' },
-    { field: { username: 1 }, unique: true, name: 'username_1' },
-    { field: { userKey: 1 }, unique: true, name: 'userKey_1' },
-    { field: { deleted: 1 }, name: 'deleted_1' },
-    { field: { active: 1 }, name: 'active_1' },
-    { field: { createdAt: 1 }, name: 'createdAt_1' },
+    { field: { email: 1 }, unique: true, name: "email_1" },
+    { field: { username: 1 }, unique: true, name: "username_1" },
+    { field: { userKey: 1 }, unique: true, name: "userKey_1" },
+    { field: { deleted: 1 }, name: "deleted_1" },
+    { field: { active: 1 }, name: "active_1" },
+    { field: { createdAt: 1 }, name: "createdAt_1" },
   ],
-  'db-migrations': [{ field: { key: 1 }, unique: true, name: 'key_1' }],
-  'common-enums': [{ field: { name: 1 }, unique: true, name: 'name_1' }],
-  'embed-tokens': [
+  "db-migrations": [{ field: { key: 1 }, unique: true, name: "key_1" }],
+  "common-enums": [{ field: { name: 1 }, unique: true, name: "name_1" }],
+  "embed-tokens": [
     {
       field: { createdDate: 1 },
-      name: 'createdDate_ttl',
+      name: "createdDate_ttl",
       expireAfterSeconds: 60 * 5, // 5 Minutes
     },
   ],
-  'archives': [
-    { field: { reference: 1, type: 1 }, name: 'reference_1_type_1' },
-    { field: { type: 1, endsAt: -1 }, name: 'type_1_endsAt_1' },
+  archives: [
+    { field: { reference: 1, type: 1 }, name: "reference_1_type_1" },
+    { field: { type: 1, endsAt: -1 }, name: "type_1_endsAt_1" },
   ],
-	'idempotency': [
-		{ field: { date: 1 },
-			name: 'date_ttl'
-			expireAfterSeconds: 60 * 60 * 24 * 30, // 1 month
-		},
-	],
-	'scheduled-events': [
-		{ field: { scheduledOn: 1 }, name: 'scheduledOn_1' },
-	],
-	'pipeline-events': [
-		{ field: { outcome: 1, createdAt: 1 }, name: 'outcome_createdAt_1' },
-	]
+  idempotency: [
+    {
+      field: { date: 1 },
+      name: "date_ttl",
+      expireAfterSeconds: 60 * 60 * 24 * 30, // 1 month
+    },
+  ],
+  "scheduled-events": [{ field: { scheduledOn: 1 }, name: "scheduledOn_1" }],
+  "pipeline-events": [
+    { field: { outcome: 1, createdAt: 1 }, name: "outcome_createdAt_1" },
+  ],
 };
 
 export const createIndexes = async (db: Db) => {
@@ -229,13 +236,13 @@ export const createIndexes = async (db: Db) => {
           name: index.name,
         };
 
-        if (index.unique) indexOptions['unique'] = true;
+        if (index.unique) indexOptions["unique"] = true;
         if (index.partialFilterExpression)
-          indexOptions['partialFilterExpression'] =
+          indexOptions["partialFilterExpression"] =
             index.partialFilterExpression;
         if (index.expireAfterSeconds)
-          indexOptions['expireAfterSeconds'] = index.expireAfterSeconds;
-        if (index.collation) indexOptions['collation'] = index.collation;
+          indexOptions["expireAfterSeconds"] = index.expireAfterSeconds;
+        if (index.collation) indexOptions["collation"] = index.collation;
 
         if (!existingIndexNames.includes(index.name)) {
           await collection.createIndex(indexField, indexOptions);
