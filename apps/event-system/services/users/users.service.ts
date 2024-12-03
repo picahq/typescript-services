@@ -726,6 +726,121 @@ module.exports = {
         }
       },
     },
+    mockOauth: {
+
+      params: {
+        user: {
+          type: 'object',
+          props: {
+            login: { type: 'string' },
+            id: { type: 'number' },
+            node_id: { type: 'string' },
+            avatar_url: { type: 'string' },
+            gravatar_id: { type: 'string' },
+            url: { type: 'string' },
+            type: { type: 'string' },
+            user_view_type: { type: 'string' },
+            site_admin: { type: 'boolean' },
+            name: { type: 'string' },
+          },
+        },
+        emails: {
+          type: 'array',
+          items: {
+            type: 'object',
+            props: {
+              email: { type: 'string' },
+              primary: { type: 'boolean' },
+              verified: { type: 'boolean' },
+              visibility: { type: 'string' },
+            },
+          },
+      },
+    },
+
+      async handler (ctx: any) {
+        try {
+
+          const secretKey = ctx?.meta?.request?.headers?.['x-mock-user-secret-key'];
+          if (secretKey !== process.env.MOCK_USER_SECRET_KEY) {
+            throw new MoleculerError(
+              'The secret key is invalid',
+              401,
+              'unauthorized',
+              {}
+            );
+          }
+
+          const { user, emails } = ctx.params;
+
+          const email = emails?.[0]?.email;
+          const username = user.login;
+          const [firstName, lastName] = getFirstAndLastNameFromName(user.name);
+          const avatar = user.avatar_url;
+          const profileLink = user.url;
+
+          let _user;
+
+          // Create or update user
+          try {
+            _user = await this.createOrUpdateUser({
+              ctx,
+              provider: 'mock',
+              user,
+              emails,
+              email,
+              username,
+              firstName,
+              lastName,
+              avatar,
+              profileLink,
+            });
+          } catch (error) {
+            console.error(error);
+            if (error.type === new OAuthAccountAlreadyAssociated().type) {
+              throw error;
+            }
+            throw new AuthGenericError();
+          }
+        
+          // Create token
+          try {
+            const { _id, email, userKey, firstName, lastName, state, pointers } =
+              _user;
+            // use buildableId in client due to old users having user.buildableId == coreId
+            const buildableId = get(_user, 'client.buildableId');
+            const containerId = get(_user, 'client.containers[0]._id');
+        
+            const token = this.createToken({
+              _id,
+              email,
+              username,
+              userKey,
+              buildableId,
+              containerId,
+              firstName,
+              lastName,
+              pointers,
+            });
+        
+            return {
+              token,
+              state,
+            };
+          } catch (error) {
+            console.error(error);
+            throw new AuthGenericError();
+          }
+
+
+        }
+        catch (error) {
+          console.error(error);
+          throw new AuthGenericError();
+        }
+      }
+
+    },
   },
 
   methods: {
