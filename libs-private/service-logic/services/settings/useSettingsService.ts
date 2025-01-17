@@ -78,9 +78,6 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
 
         const eventAccessRecord = eventAccessRecordResult.unwrap()?.[0];
 
-        console.log("eventAccessRecord");
-        console.log(eventAccessRecord);
-
         if (configuration) {
           const secretsRecord = await createSecret(
             configuration,
