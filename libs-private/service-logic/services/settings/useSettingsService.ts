@@ -72,7 +72,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
         const eventAccessRecordResult = await findEventAccess<EventAccess>({
           query: {
             "ownership.buildableId": ownership.buildableId,
-            "key": `event_access::custom::${platform.environment || "test"}::default::event-inc::internal-ui`
+            "key": `event_access::custom::${platform?.environment || "test"}::default::event-inc::internal-ui`
           },
         });
 

@@ -1,4 +1,4 @@
-import { INTEGRATIONOS_VERSION } from '@libs-private/constants';
+import { PICA_VERSION } from '@libs-private/constants';
 import { ListResponse } from '@libs-private/data-models';
 import {
   EventAccessKeyData,
@@ -84,7 +84,7 @@ export const producePartialTopicFromEventAccessKeyData = (
   const type = eventAccessKeyData[1][2];
   const group = eventAccessKeyData[1][3];
 
-  return `${INTEGRATIONOS_VERSION}/${buildableId}.${namespace}.${environment}.${type}.${group}`;
+  return `${PICA_VERSION}/${buildableId}.${namespace}.${environment}.${type}.${group}`;
 };
 
 export const getPathsFromEventAccessKeyData = (

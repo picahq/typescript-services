@@ -160,7 +160,7 @@ export const testConnectionModelDefinition = async (
     url: `${url}/${connectionModelDefinitionId}`,
     method: 'POST',
     headers: {
-      'x-integrationos-secret': process.env
+      'x-pica-secret': process.env
         .QA_ACCOUNT_EVENT_ACCESS_KEY as string,
     },
     data: {

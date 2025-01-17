@@ -130,8 +130,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           url: CREATE_CONNECTION_URL,
           method: 'POST',
           headers: {
-            'x-integrationos-secret':
-              headers['x-integrationos-secret'] ??
+            'x-pica-secret':
+              headers['x-pica-secret'] ??
               recordsList?.rows?.[0]?.accessKey,
           },
           data: {
@@ -225,7 +225,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           identity
         );
 
-        let secret = headers['x-integrationos-secret'];
+        let secret = headers['x-pica-secret'];
 
         if (!secret || secret === 'redacted') {
           secret = recordsList?.rows?.[0]?.accessKey;
@@ -235,7 +235,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
           url: `${CREATE_OAUTH_CONNECTION_URL}/${type}`,
           method: 'POST',
           headers: {
-            'x-integrationos-secret': secret,
+            'x-pica-secret': secret,
           },
           data: {
             __isEngineeringAccount__:
@@ -292,11 +292,11 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         url: GET_EVENT_ACCESS_RECORD_URL,
         method: 'GET',
         headers: {
-          'x-integrationos-secret': headers['x-integrationos-secret'],
-          'x-integrationos-redaction': false,
+          'x-pica-secret': headers['x-pica-secret'],
+          'x-pica-redaction': false,
         },
         params: {
-          accessKey: headers['x-integrationos-secret'],
+          accessKey: headers['x-pica-secret'],
         },
       });
 
@@ -309,7 +309,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       const link = await generateEventLinkRecord({
         ttl: 2 * 1000 * 60 * 60,
         ownership: records?.rows?.[0]?.ownership,
-        environment: headers['x-integrationos-secret'].startsWith('sk_test')
+        environment: headers['x-pica-secret'].startsWith('sk_test')
           ? 'test'
           : 'live',
         usageSource: 'user-dashboard',
@@ -352,15 +352,23 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         }
       );
 
+      // Filter the connected platforms based on the environment
+      const connectedPlatformsFiltered = connectedPlatforms?.filter(
+        (platform) =>
+          headers['x-pica-secret'].startsWith('sk_test')
+            ? platform?.environment === 'test'
+            : platform?.environment === 'live'
+      );
+
       const sessionId = await generateId('session_id');
 
       const tokenPayload = {
         linkSettings: {
-          connectedPlatforms: connectedPlatforms ?? [],
+          connectedPlatforms: connectedPlatformsFiltered ?? [],
           eventIncToken: linkToken?.token,
         },
         ttl: 5 * 60 * 1000,
-        environment: headers['x-integrationos-secret'].startsWith('sk_test')
+        environment: headers['x-pica-secret'].startsWith('sk_test')
           ? 'test'
           : 'live',
         features: settings?.features,
@@ -408,8 +416,8 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         method: 'GET',
         headers: {
           // @ts-ignore
-          'x-integrationos-secret': `sk_test${decoded?.payload?.pointers?.[0]}`,
-          'x-integrationos-redaction': false,
+          'x-pica-secret': `sk_test${decoded?.payload?.pointers?.[0]}`,
+          'x-pica-redaction': false,
         },
         params: {
           // @ts-ignore

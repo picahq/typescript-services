@@ -7,4 +7,4 @@ The Typescript Service is a MoleculerJS based monorepo that contains all the ser
 
 ## License
 
-IntegrationOS's Typescript Services is released under the [**GPL-3.0 license**](LICENSE).
+Pica's Typescript Services is released under the [**GPL-3.0 license**](LICENSE).

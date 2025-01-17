@@ -28,7 +28,7 @@ export class EmbedToken {
       return this.configs.baseUrl;
     }
 
-    return 'https://api.integrationos.com/internal';
+    return 'https://api.picaos.com/internal';
   }
 
   async create(payload: {
@@ -46,7 +46,7 @@ export class EmbedToken {
 
 export const getHeaders = (secret: string) => {
   return {
-    'X-Buildable-Secret': secret,
+    'X-Pica-Secret': secret,
     'Content-Type': 'application/json',
   };
 };
