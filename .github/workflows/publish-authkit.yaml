@@ -1,6 +1,9 @@
 name: Publish AuthKit Package to NPM
 
 on:
+  push:
+    branches:
+      - rebuild-package-lock
   release:
     types: [created]
 
