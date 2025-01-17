@@ -112,10 +112,10 @@ export const internalRoute = () => ({
       .split(',')[0]
       .trim();
 
-    if (req.headers['x-buildable-secret']) {
+    if (req.headers['x-pica-secret']) {
       try {
         const eventAccess = await ctx.broker.call('v1.event-access.verify', {
-          secret: req.headers['x-buildable-secret'],
+          secret: req.headers['x-pica-secret'],
         });
 
         ctx.meta.eventAccess = eventAccess;
