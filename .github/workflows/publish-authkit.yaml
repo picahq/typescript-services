@@ -20,7 +20,12 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org/'
       - name: Install dependencies
-        run: npm install
+        run: |
+          if [ -f package-lock.json ]; then
+            npm clean-install .
+          else
+            npm install .
+          fi
       - name: Build
         run: npm run build
       - name: Publish
