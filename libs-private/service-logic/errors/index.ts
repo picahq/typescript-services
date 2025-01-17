@@ -5,9 +5,9 @@ const { MoleculerError } = Errors;
 export class MissingBuildableSecretInHeaderError extends MoleculerError {
   constructor() {
     super(
-      'Missing X-Buildable-Secret in headers',
+      'Missing X-Pica-Secret in headers',
       422,
-      'missing-x-buildable-secret',
+      'missing-x-pica-secret',
       {}
     );
   }
