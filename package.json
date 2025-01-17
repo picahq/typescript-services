@@ -1,8 +1,8 @@
 {
   "name": "typescript-services",
   "version": "1.0.0",
-  "description": "IntegrationOS Backend Typescript Services",
-  "author": "@IntegrationOS",
+  "description": "Pica Backend Typescript Services",
+  "author": "@picahq",
   "scripts": {
     "build": "tsc --build tsconfig.json && tsc-alias -p tsconfig.json",
     "run-migrations::before": "export RUN_STATE=before && tsc --build tsconfig.json && tsc-alias -p tsconfig.json && node dist/libs-private/db-management/migrations/migrationsRunner.js",

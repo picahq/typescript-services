@@ -28,24 +28,8 @@ export default {
         function analyzeSubscription(subscriptionData: Stripe.SubscriptionItem[]): string {
           const priceIds = new Set(subscriptionData.map((item) => item.price.id));
 
-          if (priceIds.has(process.env.STRIPE_PRO_PLAN_PRICE_ID) && priceIds.has(process.env.STRIPE_SUPPORT_PLAN_PRICE_ID)) {
-            return 'sub::pro_support';
-          }
-
           if (priceIds.has(process.env.STRIPE_PRO_PLAN_PRICE_ID)) {
             return 'sub::pro';
-          }
-
-          if (priceIds.has(process.env.STRIPE_SUPPORT_PLAN_PRICE_ID)) {
-            return 'sub::support';
-          }
-
-          if (priceIds.has(process.env.STRIPE_GROWTH_PLAN_PRICE_ID)) {
-            return 'sub::growth';
-          }
-
-          if (priceIds.has(process.env.STRIPE_RIDICULOUSLY_CHEAP_PLAN_PRICE_ID)) {
-            return 'sub::ridiculous';
           }
 
           if (priceIds.has(process.env.STRIPE_FREE_PLAN_PRICE_ID)) {

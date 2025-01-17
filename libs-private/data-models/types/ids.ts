@@ -10,6 +10,7 @@ export const idPrefixes = {
   linkToken: 'ln_tk',
   setting: 'st',
   token: 'embed_tk',
+  earlyAccess: 'ea',
 } as const;
 
 export type IdPrefix = (typeof idPrefixes)[keyof typeof idPrefixes];

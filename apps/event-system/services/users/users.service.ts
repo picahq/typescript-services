@@ -144,6 +144,7 @@ module.exports = {
     'username',
     'userKey',
     'billing',
+    'accessList',
   ],
 
   actions: {
@@ -868,6 +869,7 @@ module.exports = {
     }: any) {
       const updateUser = async (_user: any) => {
         const profile = get(_user, 'profile');
+        const accessList = get(_user, 'accessList');
         const _firstName = get(_user, 'firstName')
           ? get(_user, 'firstName')
           : firstName;
@@ -907,6 +909,7 @@ module.exports = {
           id: _user._id,
           firstName: _firstName,
           lastName: _lastName,
+          accessList,
           username: _user.username ? _user.username : username,
           userKey: _user.userKey
             ? _user.userKey
@@ -988,6 +991,7 @@ module.exports = {
           _user = await ctx.broker.call('v3.users.create', {
             email,
             username,
+            accessList: [],
             userKey: `${username || email.substring(0, email.indexOf('@'))
               }${randomCode(6)}`,
             providers: {

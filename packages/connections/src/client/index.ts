@@ -29,7 +29,7 @@ export class AuthKitToken {
       return this.configs.baseUrl;
     }
 
-    return 'https://api.integrationos.com/internal';
+    return 'https://api.picaos.com/internal';
   }
 
   async create(payload?: {

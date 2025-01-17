@@ -20,7 +20,7 @@ export const createSecret = async (
     url: process.env.SECRETS_SERVICE_BASE_URL + 'v1/secrets',
     method: 'POST',
     headers: {
-      "x-integrationos-secret": eventAccessKey
+      "x-pica-secret": eventAccessKey
     },
     data: {
       secret
@@ -50,7 +50,7 @@ export const getSecret = async (
     url: process.env.SECRETS_SERVICE_BASE_URL + `v1/secrets/${secretsServiceId}`,
     method: 'POST',
     headers: {
-      "x-integrationos-secret": eventAccessKey
+      "x-pica-secret": eventAccessKey
     }
   });
 

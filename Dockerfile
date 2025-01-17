@@ -4,7 +4,7 @@
 #   docker build --secret id=NPM_TOKEN .
 #
 # This keeps the NPM token out of the image history
-# NPM_TOKEN needs access to the @integrationos organization in NPM
+# NPM_TOKEN needs access to the @picahq organization in NPM
 
 FROM node:16.13.0
 
