@@ -200,9 +200,25 @@ module.exports = {
           values: ['completed-onboarding'],
           optional: true,
         },
+        role: {
+          type: 'string',
+          optional: true,
+        },
+        companyWebsite: {
+          type: 'string',
+          optional: true,
+        },
+        companySize: {
+          type: 'string',
+          optional: true,
+        },
+        buildingAI: {
+          type: 'boolean',
+          optional: true,
+        },
       },
       async handler(ctx: any) {
-        const { firstName, lastName, avatar, state, ...rest } = ctx.params;
+        const { firstName, lastName, avatar, state, role, companyWebsite, companySize, buildingAI, ...rest } = ctx.params;
 
         try {
           const user = await ctx.broker.call(
@@ -227,6 +243,10 @@ module.exports = {
                 ...(firstName ? { firstName } : {}),
                 ...(lastName ? { lastName } : {}),
                 ...(avatar ? { avatar } : {}),
+                ...(role ? { role } : {}),
+                ...(companyWebsite ? { companyWebsite } : {}),
+                ...(companySize ? { companySize } : {}),
+                ...(buildingAI ? { buildingAI } : {}),
               },
               ...(state ? { state } : {}),
               ...(state
