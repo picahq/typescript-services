@@ -304,9 +304,13 @@ module.exports = {
           type: 'string',
           convert: true,
         },
+        isTerminal: {
+          type: 'boolean',
+          optional: true,
+        },
       },
       async handler(ctx: any) {
-        const { type, code } = ctx.params;
+        const { type, code, isTerminal = false } = ctx.params;
 
         const map = {
           github: async (code: any) => {
@@ -591,7 +595,7 @@ module.exports = {
           lastName,
           avatar,
           profileLink,
-        } = await fn(code);
+        } = await fn(code, isTerminal);
 
         if (!email) {
           console.debug(
@@ -643,7 +647,7 @@ module.exports = {
           const buildableId = get(_user, 'client.buildableId');
           const containerId = get(_user, 'client.containers[0]._id');
 
-          const token = this.createToken({
+          const token = await this.createToken({
             _id,
             email,
             username,
@@ -654,6 +658,11 @@ module.exports = {
             lastName,
             pointers,
           });
+
+          if (isTerminal) {
+            const { testKey, liveKey } = await this.createOrGetEventAccessKeys(token, pointers);
+            return { testKey, liveKey };
+          }
 
           return {
             token,
@@ -1147,5 +1156,79 @@ module.exports = {
 
       return token;
     },
+    async createOrGetEventAccessKeys(token: string, pointers: string[]) {
+
+      // Let's list the event access records for the user
+      const listEventAccessRecords = await axios({
+        method: 'get',
+        url: RUST_INTERNAL_API_ENDPOINTS.GET_EVENT_ACCESS_RECORD,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'x-pica-show-all-environments': true,
+          'x-pica-secret': `sk_test${pointers[0]}`,
+        },
+      });
+
+      const filteredEventAccessRecords = listEventAccessRecords?.data?.rows?.filter(
+        (record: any) => !['DEFAULT-LIVE-KEY', 'DEFAULT-TEST-KEY'].includes(record.name)
+      );
+
+      // Get existing keys or create new ones
+      const testKey = await this.getOrCreateAccessKey({
+        existingRecords: filteredEventAccessRecords,
+        environment: 'test',
+        token,
+        pointer: pointers[0],
+      });
+
+
+      const liveKey = await this.getOrCreateAccessKey({
+        existingRecords: filteredEventAccessRecords,
+        environment: 'live',
+        token,
+        pointer: pointers[1],
+      });
+
+
+      return { testKey, liveKey };
+    },
+
+    async getOrCreateAccessKey({ existingRecords, environment, token, pointer }: {
+      existingRecords: any[],
+      environment: 'test' | 'live',
+      token: string,
+      pointer: string
+    }) {
+      let key = existingRecords?.find(record => record.environment === environment)?.accessKey;
+
+      if (!key) {
+        const response = await axios({
+          method: 'post',
+          url: RUST_INTERNAL_API_ENDPOINTS.GET_EVENT_ACCESS_RECORD,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            'x-pica-secret': `sk_${environment}${pointer}`,
+          },
+          data: {
+            name: `${environment}-key`,
+            group: `${environment}-key`,
+            connectionType: "custom",
+            platform: "pica",
+            paths: {
+              id: null,
+              event: null,
+              payload: null,
+              secret: null,
+              signature: null,
+            },
+          }
+        });
+        key = response?.data?.accessKey;
+      }
+
+      return key;
+    }
   },
 };
