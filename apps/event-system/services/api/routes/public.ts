@@ -6,7 +6,6 @@ import { checkBlacklist } from '@libs-private/utils/security';
 import { get } from 'lodash';
 import { IncomingMessage } from 'http';
 
-
 export const publicRoute = () => ({
   name: 'public',
   path: '/public',
@@ -30,6 +29,7 @@ export const publicRoute = () => ({
     'v1.stripe-webhook.handleWebhook',
 
     'v3.users.mockOauth',
+    'v3.users.provider',
   ],
 
   aliases: {
@@ -56,7 +56,7 @@ export const publicRoute = () => ({
     'POST v1/embed-tokens/update': 'v1.embed-tokens.public.update',
     'POST v1/stripe-webhook': 'v1.stripe-webhook.handleWebhook',
     'POST v3/users/mock-oauth': 'v3.users.mockOauth',
-
+    'GET 	v3/users/oauth/provider/:provider': 'v3.users.provider',
   },
 
   cors: {
@@ -119,9 +119,15 @@ export const publicRoute = () => ({
     json: {
       strict: false,
       limit: '5MB',
-      verify: (req: IncomingMessage, res: any, buf: Buffer, encoding: string | undefined) => {
+      verify: (
+        req: IncomingMessage,
+        res: any,
+        buf: Buffer,
+        encoding: string | undefined
+      ) => {
         if (req.url === '/v1/stripe-webhook') {
-          const validEncoding: BufferEncoding = encoding as BufferEncoding || 'utf8';
+          const validEncoding: BufferEncoding =
+            (encoding as BufferEncoding) || 'utf8';
           (req as any).rawBody = buf.toString(validEncoding);
         }
       },
@@ -129,7 +135,7 @@ export const publicRoute = () => ({
     urlencoded: {
       extended: true,
       limit: '1MB',
-    }
+    },
   },
 
   // Mapping policy setting. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Mapping-policy

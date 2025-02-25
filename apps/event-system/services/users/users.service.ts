@@ -2,6 +2,7 @@
 require('dotenv').config();
 
 import { Context, Errors } from 'moleculer';
+
 const { MoleculerError } = Errors;
 
 import axios from 'axios';
@@ -27,6 +28,17 @@ class AuthGenericError extends MoleculerError {
   }
 }
 
+class OAuthAccountAlreadyAssociated extends MoleculerError {
+  constructor() {
+    super(
+      'This oauth account is already associated with an existing Buildable account.',
+      400,
+      'oauth-account-already-associated',
+      {}
+    );
+  }
+}
+
 class GithubAuthGenericError extends MoleculerError {
   constructor() {
     super(
@@ -44,17 +56,6 @@ class GitlabAuthGenericError extends MoleculerError {
       'Something went wrong during Gitlab authentication',
       500,
       'gitlab-authentication-error',
-      {}
-    );
-  }
-}
-
-class OAuthAccountAlreadyAssociated extends MoleculerError {
-  constructor() {
-    super(
-      'This oauth account is already associated with an existing Buildable account.',
-      400,
-      'oauth-account-already-associated',
       {}
     );
   }
@@ -87,7 +88,7 @@ const ACCESS_KEY_PREFIX_LENGTH = 7;
 
 const RUST_INTERNAL_API_ENDPOINTS = {
   CREATE_EVENT_ACCESS_RECORD: `${process.env.CONNECTIONS_API_BASE_URL}v1/public/event-access/default`,
-  GET_EVENT_ACCESS_RECORD: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`
+  GET_EVENT_ACCESS_RECORD: `${process.env.CONNECTIONS_API_BASE_URL}v1/event-access`,
 };
 
 const generate_default_event_access_record = (
@@ -165,21 +166,19 @@ module.exports = {
           await ctx.broker.call(
             `v${this.version}.${this.name}.remove`,
             {
-              id: userId
+              id: userId,
             },
             { meta: ctx.meta }
           );
 
           return {
-            message: 'User deleted successfully'
+            message: 'User deleted successfully',
           };
-
-        }
-        catch (error) {
+        } catch (error) {
           console.error(error);
           throw new SomethingWentWrong();
         }
-      }
+      },
     },
     updateUserFromToken: {
       params: {
@@ -218,7 +217,17 @@ module.exports = {
         },
       },
       async handler(ctx: any) {
-        const { firstName, lastName, avatar, state, role, companyWebsite, companySize, buildingAI, ...rest } = ctx.params;
+        const {
+          firstName,
+          lastName,
+          avatar,
+          state,
+          role,
+          companyWebsite,
+          companySize,
+          buildingAI,
+          ...rest
+        } = ctx.params;
 
         try {
           const user = await ctx.broker.call(
@@ -251,14 +260,14 @@ module.exports = {
               ...(state ? { state } : {}),
               ...(state
                 ? {
-                  stateHistory: [
-                    {
-                      state,
-                      createdAt: Date.now(),
-                      createdDate: new Date(),
-                    },
-                  ].concat(get(user, 'stateHistory') || []),
-                }
+                    stateHistory: [
+                      {
+                        state,
+                        createdAt: Date.now(),
+                        createdDate: new Date(),
+                      },
+                    ].concat(get(user, 'stateHistory') || []),
+                  }
                 : {}),
             },
             { meta: ctx.meta }
@@ -443,9 +452,9 @@ module.exports = {
 
             const email = Array.isArray(emails)
               ? get(
-                emails.find((v) => get(v, 'primary')),
-                'email'
-              )
+                  emails.find((v) => get(v, 'primary')),
+                  'email'
+                )
               : null;
 
             const username = get(user, 'login');
@@ -660,7 +669,10 @@ module.exports = {
           });
 
           if (isTerminal) {
-            const { testKey, liveKey } = await this.createOrGetEventAccessKeys(token, pointers);
+            const { testKey, liveKey } = await this.createOrGetEventAccessKeys(
+              token,
+              pointers
+            );
             return { testKey, liveKey };
           }
 
@@ -756,8 +768,25 @@ module.exports = {
         }
       },
     },
-    mockOauth: {
+    provider: {
+      async handler(ctx: Context) {
+        // @ts-ignore
+        const { provider }: { provider: string } = ctx.params;
+				const randomNonce = randomCode(10);
 
+        switch (provider.toLowerCase()) {
+          case 'github':
+            // @ts-ignore
+            ctx.meta.$statusCode = 303;
+            // @ts-ignore
+            ctx.meta.$location = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_OAUTH_CLIENT_ID}&state=${randomNonce}&scope=read:user user:email`;
+            break;
+          default:
+            throw new AuthGenericError();
+        }
+      },
+    },
+    mockOauth: {
       params: {
         user: {
           type: 'object',
@@ -785,13 +814,13 @@ module.exports = {
               visibility: { type: 'string' },
             },
           },
+        },
       },
-    },
 
-      async handler (ctx: any) {
+      async handler(ctx: any) {
         try {
-
-          const secretKey = ctx?.meta?.request?.headers?.['x-mock-user-secret-key'];
+          const secretKey =
+            ctx?.meta?.request?.headers?.['x-mock-user-secret-key'];
 
           if (!secretKey) {
             throw new MoleculerError(
@@ -842,15 +871,22 @@ module.exports = {
             }
             throw new AuthGenericError();
           }
-        
+
           // Create token
           try {
-            const { _id, email, userKey, firstName, lastName, state, pointers } =
-              _user;
+            const {
+              _id,
+              email,
+              userKey,
+              firstName,
+              lastName,
+              state,
+              pointers,
+            } = _user;
             // use buildableId in client due to old users having user.buildableId == coreId
             const buildableId = get(_user, 'client.buildableId');
             const containerId = get(_user, 'client.containers[0]._id');
-        
+
             const token = this.createToken({
               _id,
               email,
@@ -862,7 +898,7 @@ module.exports = {
               lastName,
               pointers,
             });
-        
+
             return {
               token,
               state,
@@ -871,15 +907,11 @@ module.exports = {
             console.error(error);
             throw new AuthGenericError();
           }
-
-
-        }
-        catch (error) {
+        } catch (error) {
           console.error(error);
           throw error;
         }
-      }
-
+      },
     },
   },
 
@@ -911,28 +943,28 @@ module.exports = {
         );
         const connectedAccounts = connectedAccount
           ? //ensure old connectedAccount data is updated
-          (get(_user, 'connectedAccounts') || []).map((i: any) =>
-            i.email === email && i.provider === provider
-              ? {
-                ...i,
+            (get(_user, 'connectedAccounts') || []).map((i: any) =>
+              i.email === email && i.provider === provider
+                ? {
+                    ...i,
+                    name: `${firstName} ${lastName}`.trim(),
+                    email,
+                    provider,
+                    username,
+                    profileLink,
+                  }
+                : i
+            )
+          : [
+              {
                 name: `${firstName} ${lastName}`.trim(),
                 email,
                 provider,
                 username,
                 profileLink,
-              }
-              : i
-          )
-          : [
-            {
-              name: `${firstName} ${lastName}`.trim(),
-              email,
-              provider,
-              username,
-              profileLink,
-              connectedAt: Date.now(),
-            },
-          ].concat(get(_user, 'connectedAccounts') || []);
+                connectedAt: Date.now(),
+              },
+            ].concat(get(_user, 'connectedAccounts') || []);
 
         return await ctx.broker.call('v3.users.update', {
           id: _user._id,
@@ -942,8 +974,9 @@ module.exports = {
           username: _user.username ? _user.username : username,
           userKey: _user.userKey
             ? _user.userKey
-            : `${username || email.substring(0, email.indexOf('@'))
-            }${randomCode(6)}`,
+            : `${
+                username || email.substring(0, email.indexOf('@'))
+              }${randomCode(6)}`,
           [`providers.${provider}`]: user,
           connectedAccounts,
           profile: {
@@ -1021,8 +1054,9 @@ module.exports = {
             email,
             username,
             accessList: [],
-            userKey: `${username || email.substring(0, email.indexOf('@'))
-              }${randomCode(6)}`,
+            userKey: `${
+              username || email.substring(0, email.indexOf('@'))
+            }${randomCode(6)}`,
             providers: {
               [provider]: user,
             },
@@ -1157,7 +1191,6 @@ module.exports = {
       return token;
     },
     async createOrGetEventAccessKeys(token: string, pointers: string[]) {
-
       // Let's list the event access records for the user
       const listEventAccessRecords = await axios({
         method: 'get',
@@ -1170,9 +1203,11 @@ module.exports = {
         },
       });
 
-      const filteredEventAccessRecords = listEventAccessRecords?.data?.rows?.filter(
-        (record: any) => !['DEFAULT-LIVE-KEY', 'DEFAULT-TEST-KEY'].includes(record.name)
-      );
+      const filteredEventAccessRecords =
+        listEventAccessRecords?.data?.rows?.filter(
+          (record: any) =>
+            !['DEFAULT-LIVE-KEY', 'DEFAULT-TEST-KEY'].includes(record.name)
+        );
 
       // Get existing keys or create new ones
       const testKey = await this.getOrCreateAccessKey({
@@ -1182,7 +1217,6 @@ module.exports = {
         pointer: pointers[0],
       });
 
-
       const liveKey = await this.getOrCreateAccessKey({
         existingRecords: filteredEventAccessRecords,
         environment: 'live',
@@ -1190,17 +1224,23 @@ module.exports = {
         pointer: pointers[1],
       });
 
-
       return { testKey, liveKey };
     },
 
-    async getOrCreateAccessKey({ existingRecords, environment, token, pointer }: {
-      existingRecords: any[],
-      environment: 'test' | 'live',
-      token: string,
-      pointer: string
+    async getOrCreateAccessKey({
+      existingRecords,
+      environment,
+      token,
+      pointer,
+    }: {
+      existingRecords: any[];
+      environment: 'test' | 'live';
+      token: string;
+      pointer: string;
     }) {
-      let key = existingRecords?.find(record => record.environment === environment)?.accessKey;
+      let key = existingRecords?.find(
+        (record) => record.environment === environment
+      )?.accessKey;
 
       if (!key) {
         const response = await axios({
@@ -1214,8 +1254,8 @@ module.exports = {
           data: {
             name: `${environment}-key`,
             group: `${environment}-key`,
-            connectionType: "custom",
-            platform: "pica",
+            connectionType: 'custom',
+            platform: 'pica',
             paths: {
               id: null,
               event: null,
@@ -1223,12 +1263,12 @@ module.exports = {
               secret: null,
               signature: null,
             },
-          }
+          },
         });
         key = response?.data?.accessKey;
       }
 
       return key;
-    }
+    },
   },
 };
