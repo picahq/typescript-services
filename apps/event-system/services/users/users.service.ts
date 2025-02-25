@@ -647,7 +647,7 @@ module.exports = {
           const buildableId = get(_user, 'client.buildableId');
           const containerId = get(_user, 'client.containers[0]._id');
 
-          const token = await this.createToken({
+          const token = this.createToken({
             _id,
             email,
             username,
