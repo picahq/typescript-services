@@ -336,9 +336,10 @@ module.exports = {
                   client_id: ctx.meta.isAdmin
                     ? process.env.ADMIN_GITHUB_OAUTH_CLIENT_ID
                     : process.env.GITHUB_OAUTH_CLIENT_ID,
-                  client_secret: ctx.meta.isAdmin
-                    ? process.env.ADMIN_GITHUB_OAUTH_CLIENT_SECRET
-                    : process.env.GITHUB_OAUTH_CLIENT_SECRET,
+                  client_secret: this.getClientSecret(
+                    isTerminal,
+                    ctx.meta.isAdmin
+                  ),
                   code,
                 },
                 decompress: false,
@@ -400,7 +401,7 @@ module.exports = {
                 console.error(error.response.headers);
 
                 throw new MoleculerError(
-                  'Error occured trying to retrieve github user info',
+                  'Error occurred trying to retrieve github user info',
                   500,
                   'github-user-retrieval'
                 );
@@ -435,7 +436,7 @@ module.exports = {
                 console.error(error.response.headers);
 
                 throw new MoleculerError(
-                  'Error occured trying to retrieve github user emails',
+                  'Error occurred trying to retrieve github user emails',
                   500,
                   'github-user-emails-retrieval'
                 );
@@ -506,7 +507,7 @@ module.exports = {
                   get(
                     accessTokenResult,
                     'error.response.data.error_description'
-                  ) || `Error occured calling https://gitlab.com/oauth/token`;
+                  ) || `Error occurred calling https://gitlab.com/oauth/token`;
 
                 throw new MoleculerError(
                   message,
@@ -542,7 +543,7 @@ module.exports = {
                 console.error(error.response.headers);
 
                 throw new MoleculerError(
-                  'Error occured trying to retrieve gitlab user info',
+                  'Error occurred trying to retrieve gitlab user info',
                   500,
                   'github-user-retrieval'
                 );
@@ -772,14 +773,14 @@ module.exports = {
       async handler(ctx: Context) {
         // @ts-ignore
         const { provider }: { provider: string } = ctx.params;
-				const randomNonce = randomCode(10);
+        const randomNonce = randomCode(10);
 
         switch (provider.toLowerCase()) {
           case 'github':
             // @ts-ignore
             ctx.meta.$statusCode = 303;
             // @ts-ignore
-            ctx.meta.$location = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_OAUTH_CLIENT_ID}&state=${randomNonce}&scope=read:user user:email`;
+            ctx.meta.$location = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_OAUTH_CLIENT_CLI_ID}&state=${randomNonce}&scope=read:user user:email`;
             break;
           default:
             throw new AuthGenericError();
@@ -916,6 +917,11 @@ module.exports = {
   },
 
   methods: {
+    getClientSecret(isTerminal: boolean, isAdmin: boolean) {
+      if (isTerminal) return process.env.GITHUB_OAUTH_CLIENT_CLI_SECRET;
+      if (isAdmin) return process.env.ADMIN_GITHUB_OAUTH_CLIENT_SECRET;
+      return process.env.GITHUB_OAUTH_CLIENT_SECRET;
+    },
     async createOrUpdateUser({
       ctx,
       provider,
