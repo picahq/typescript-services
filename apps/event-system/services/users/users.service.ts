@@ -401,7 +401,7 @@ module.exports = {
                 console.error(error.response.headers);
 
                 throw new MoleculerError(
-                  'Error occured trying to retrieve github user info',
+                  'Error occurred trying to retrieve github user info',
                   500,
                   'github-user-retrieval'
                 );
@@ -436,7 +436,7 @@ module.exports = {
                 console.error(error.response.headers);
 
                 throw new MoleculerError(
-                  'Error occured trying to retrieve github user emails',
+                  'Error occurred trying to retrieve github user emails',
                   500,
                   'github-user-emails-retrieval'
                 );
@@ -507,7 +507,7 @@ module.exports = {
                   get(
                     accessTokenResult,
                     'error.response.data.error_description'
-                  ) || `Error occured calling https://gitlab.com/oauth/token`;
+                  ) || `Error occurred calling https://gitlab.com/oauth/token`;
 
                 throw new MoleculerError(
                   message,
@@ -543,7 +543,7 @@ module.exports = {
                 console.error(error.response.headers);
 
                 throw new MoleculerError(
-                  'Error occured trying to retrieve gitlab user info',
+                  'Error occurred trying to retrieve gitlab user info',
                   500,
                   'github-user-retrieval'
                 );
