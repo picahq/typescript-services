@@ -333,9 +333,7 @@ module.exports = {
                   'Accept-Encoding': 'UTF-8',
                 },
                 params: {
-                  client_id: ctx.meta.isAdmin
-                    ? process.env.ADMIN_GITHUB_OAUTH_CLIENT_ID
-                    : process.env.GITHUB_OAUTH_CLIENT_ID,
+                  client_id: this.getClientId(isTerminal, ctx.meta.isAdmin),
                   client_secret: this.getClientSecret(
                     isTerminal,
                     ctx.meta.isAdmin
@@ -921,6 +919,11 @@ module.exports = {
       if (isTerminal) return process.env.GITHUB_OAUTH_CLIENT_CLI_SECRET;
       if (isAdmin) return process.env.ADMIN_GITHUB_OAUTH_CLIENT_SECRET;
       return process.env.GITHUB_OAUTH_CLIENT_SECRET;
+    },
+    getClientId(isTerminal: boolean, isAdmin: boolean) {
+      if (isTerminal) return process.env.GITHUB_OAUTH_CLIENT_CLI_ID;
+      if (isAdmin) return process.env.ADMIN_GITHUB_OAUTH_CLIENT_ID;
+      return process.env.GITHUB_OAUTH_CLIENT_ID;
     },
     async createOrUpdateUser({
       ctx,
