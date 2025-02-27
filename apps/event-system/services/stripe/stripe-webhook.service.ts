@@ -1,6 +1,19 @@
 import { ServiceSchema } from 'moleculer';
 import Stripe from 'stripe';
-import { resultErr, resultOk } from '@event-inc/utils';
+import { resultErr, resultOk, makeHttpNetworkCall } from '@event-inc/utils';
+
+const TRACK_EVENT = `${process.env.CONNECTIONS_API_BASE_URL}v1/public/mark`;
+
+const context = {
+  locale: "",
+  page: {
+    path: "",
+    search: "",
+    title: "",
+    url: ""
+  },
+  userAgent: "",
+}
 
 export default {
   name: 'stripe-webhook',
@@ -65,15 +78,22 @@ export default {
               billing
             });
 
-            await ctx.broker.call('v1.tracking.public.track', {
-              path: 't',
+            await makeHttpNetworkCall({
+              url: TRACK_EVENT,
+              method: 'POST',
               data: {
-                event: 'Created Subscription',
-                properties: subscriptionCreated,
-                userId: client?.author?._id
+                path: 't',
+                data: {
+                  event: 'Created Subscription',
+                  properties: {
+                    ...subscriptionCreated,
+                    version: "pica-1.0.0"
+                  },
+                  context,
+                  userId: client?.author?._id
+                }
               }
             });
-
           }
 
           break;
@@ -103,13 +123,21 @@ export default {
               }
             );
 
-            await ctx.broker.call('v1.tracking.public.track', {
-              path: 't',
+            await makeHttpNetworkCall({
+              url: TRACK_EVENT,
+              method: 'POST',
               data: {
-                event: 'Updated Subscription',
-                properties: subscriptionUpdated,
-                userId: updatedClient?.author?._id,
-              },
+                path: 't',
+                data: {
+                  event: 'Updated Subscription',
+                  properties: {
+                    ...subscriptionUpdated,
+                    version: "pica-1.0.0"
+                  },
+                  context,
+                  userId: updatedClient?.author?._id,
+                }
+              }
             });
 
             break;
@@ -151,14 +179,22 @@ export default {
                   billing: updatedBilling,
                 }
               );
-  
-              await ctx.broker.call('v1.tracking.public.track', {
-                path: 't',
+
+              await makeHttpNetworkCall({
+                url: TRACK_EVENT,
+                method: 'POST',
                 data: {
-                  event: 'Created Subscription',
-                  properties: subscriptionCreated,
-                  userId: client?.author?._id,
-                },
+                  path: 't',
+                  data: {
+                    event: 'Created Subscription',
+                    properties: {
+                      ...subscriptionCreated,
+                      version: "pica-1.0.0"
+                    },
+                    context,
+                    userId: client?.author?._id,
+                  }
+                }
               });
             }
 
@@ -169,15 +205,23 @@ export default {
               }
             );
 
-            await ctx.broker.call('v1.tracking.public.track', {
-              path: 't',
+            await makeHttpNetworkCall({
+              url: TRACK_EVENT,
+              method: 'POST',
               data: {
-                event: 'Deleted Subscription',
-                properties: subscriptionDeleted,
-                userId: client?.author?._id,
-              },
+                path: 't',
+                data: {
+                  event: 'Deleted Subscription',
+                  properties: {
+                    ...subscriptionDeleted,
+                    version: "pica-1.0.0"
+                  },
+                  context,
+                  userId: client?.author?._id,
+                }
+              }
             });
-      
+
             break;
 
           case 'invoice.payment_failed':
@@ -200,16 +244,24 @@ export default {
               }
             );
 
-            await ctx.broker.call('v1.tracking.public.track', {
-              path: 't',
+            await makeHttpNetworkCall({
+              url: TRACK_EVENT,
+              method: 'POST',
               data: {
-                event: 'Failed Invoice Payment',
-                properties: invoicePaymentFailed,
-                userId: currentClient?.author?._id,
-              },
+                path: 't',
+                data: {
+                  event: 'Failed Invoice Payment',
+                  properties: {
+                    ...invoicePaymentFailed,
+                    version: "pica-1.0.0"
+                  },
+                  context,
+                  userId: currentClient?.author?._id,
+                }
+              }
             });
-            break;
 
+            break;
           case 'invoice.payment_succeeded':
             const invoicePaymentSucceeded = event.data.object;
 
@@ -225,13 +277,21 @@ export default {
               }
             );
 
-            await ctx.broker.call('v1.tracking.public.track', {
-              path: 't',
+            await makeHttpNetworkCall({
+              url: TRACK_EVENT,
+              method: 'POST',
               data: {
-                event: 'Successful Invoice Payment',
-                properties: invoicePaymentSucceeded,
-                userId: succeededInvoiceClient?.author?._id,
-              },
+                path: 't',
+                data: {
+                  event: 'Successful Invoice Payment',
+                  properties: {
+                    ...invoicePaymentSucceeded,
+                    version: "pica-1.0.0"
+                  },
+                  context,
+                  userId: succeededInvoiceClient?.author?._id,
+                }
+              }
             });
 
             break;
