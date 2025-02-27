@@ -158,7 +158,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         return resultErr<'service'>(
           false,
           'service_4000',
-          error?.data?.data?.error || 'Something went wrong',
+          error?.data?.data?.error || 'Invalid connection credentials',
           'buildable-core',
           false
         );
@@ -269,7 +269,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
         return resultErr<'service'>(
           false,
           'service_4000',
-          error?.data?.data?.error || 'Something went wrong',
+          error?.data?.data?.error || 'Invalid connection credentials',
           'buildable-core',
           false
         );
