@@ -333,11 +333,15 @@ module.exports = {
                   'Accept-Encoding': 'UTF-8',
                 },
                 params: {
-                  client_id: this.getClientId(isTerminal, ctx.meta.isAdmin, isMobile),
+                  client_id: this.getClientId(
+                    isTerminal,
+                    ctx.meta.isAdmin,
+                    isMobile
+                  ),
                   client_secret: this.getClientSecret(
                     isTerminal,
                     ctx.meta.isAdmin,
-										isMobile
+                    isMobile
                   ),
                   code,
                 },
