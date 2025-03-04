@@ -319,7 +319,7 @@ module.exports = {
         },
       },
       async handler(ctx: any) {
-        const { type, code, isTerminal = false } = ctx.params;
+        const { type, code, isTerminal = false, isMobile = false } = ctx.params;
 
         const map = {
           github: async (code: any) => {
@@ -333,10 +333,11 @@ module.exports = {
                   'Accept-Encoding': 'UTF-8',
                 },
                 params: {
-                  client_id: this.getClientId(isTerminal, ctx.meta.isAdmin),
+                  client_id: this.getClientId(isTerminal, ctx.meta.isAdmin, isMobile),
                   client_secret: this.getClientSecret(
                     isTerminal,
-                    ctx.meta.isAdmin
+                    ctx.meta.isAdmin,
+										isMobile
                   ),
                   code,
                 },
@@ -770,8 +771,9 @@ module.exports = {
     provider: {
       async handler(ctx: Context) {
         // @ts-ignore
-        const { provider }: { provider: string } = ctx.params;
-        const randomNonce = randomCode(10);
+        const { provider, state }: { provider: string; state: string } =
+          ctx.params;
+        const randomNonce = state ?? randomCode(10);
 
         switch (provider.toLowerCase()) {
           case 'github':
@@ -915,12 +917,14 @@ module.exports = {
   },
 
   methods: {
-    getClientSecret(isTerminal: boolean, isAdmin: boolean) {
+    getClientSecret(isTerminal: boolean, isAdmin: boolean, isMobile: boolean) {
+      if (isMobile) return process.env.GITHUB_OAUTH_CLIENT_MOBILE_SECRET;
       if (isTerminal) return process.env.GITHUB_OAUTH_CLIENT_CLI_SECRET;
       if (isAdmin) return process.env.ADMIN_GITHUB_OAUTH_CLIENT_SECRET;
       return process.env.GITHUB_OAUTH_CLIENT_SECRET;
     },
-    getClientId(isTerminal: boolean, isAdmin: boolean) {
+    getClientId(isTerminal: boolean, isAdmin: boolean, isMobile: boolean) {
+      if (isMobile) return process.env.GITHUB_OAUTH_CLIENT_MOBILE_ID;
       if (isTerminal) return process.env.GITHUB_OAUTH_CLIENT_CLI_ID;
       if (isAdmin) return process.env.ADMIN_GITHUB_OAUTH_CLIENT_ID;
       return process.env.GITHUB_OAUTH_CLIENT_ID;
