@@ -317,6 +317,10 @@ module.exports = {
           type: 'boolean',
           optional: true,
         },
+				isMobile: {
+					type: 'boolean',
+					optional: true,
+				}
       },
       async handler(ctx: any) {
         const { type, code, isTerminal = false, isMobile = false } = ctx.params;
@@ -608,7 +612,7 @@ module.exports = {
           lastName,
           avatar,
           profileLink,
-        } = await fn(code, isTerminal);
+        } = await fn(code, isTerminal, isMobile);
 
         if (!email) {
           console.debug(
@@ -672,7 +676,7 @@ module.exports = {
             pointers,
           });
 
-          if (isTerminal) {
+          if (isTerminal || isMobile) {
             const { testKey, liveKey } = await this.createOrGetEventAccessKeys(
               token,
               pointers
