@@ -2,9 +2,11 @@ import { Context } from 'moleculer';
 import { Ownership } from '@libs-private/data-models';
 import Stripe from 'stripe';
 import { BResult } from '@event-inc/types';
-import { resultErr, resultOk } from '@event-inc/utils';
+import { makeHttpNetworkCall, resultErr, resultOk } from '@event-inc/utils';
 import { ClientRecord } from '@event-inc/types/generic';
 import { useSettingsService } from '../settings/useSettingsService';
+
+const TRACK_EVENT = `${process.env.CONNECTIONS_API_BASE_URL}v1/public/mark`;
 
 export const useOnboardingService = (ctx: Context, ownership: Ownership) => {
   return {
@@ -50,13 +52,29 @@ export const useOnboardingService = (ctx: Context, ownership: Ownership) => {
           billing,
         });
 
-        // Track customer creation
-        await ctx.broker.call('v1.tracking.public.track', {
-          path: 't',
+        await makeHttpNetworkCall({
+          url: TRACK_EVENT,
+          method: 'POST',
           data: {
-            event: 'Created Customer',
-            properties: response?.customer,
-            userId: client?.author?._id
+            path: 't',
+            data: {
+              event: 'Created Customer',
+              properties: {
+                ...response?.customer,
+                version: "pica-1.0.0"
+              },
+              context: {
+                locale: "",
+                page: {
+                  path: "",
+                  search: "",
+                  title: "",
+                  url: ""
+                },
+                userAgent: "",
+              },
+              userId: client?.author?._id,
+            }
           }
         });
 
