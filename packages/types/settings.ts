@@ -17,6 +17,13 @@ export interface Platform {
   environment?: 'test' | 'live';
 }
 
+export interface BuildKitIntegration {
+  connectionDefinitionId: string;
+  active: boolean;
+  environment: 'test' | 'live';
+  platformName: string;
+}
+
 export interface Feature {
   key: string;
   value: 'enabled' | 'disabled';
@@ -32,6 +39,11 @@ export interface LinkSettings {
   createdDate: Date;
   updatedDate: Date;
   features?: Feature[];
+  buildKitIntegrations?: {
+    connectionDefinitionId: string;
+    environment: 'test' | 'live';
+    platformName: string;
+  }[]
 }
 
 export interface ListLinkSettings {

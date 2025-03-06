@@ -9,6 +9,7 @@ import {
   Platform,
   LinkSettings as Settings,
   Feature,
+  BuildKitIntegration,
 } from '@event-inc/types/settings';
 import EventAccess from '@apps/event-system/services/events/event-access.service';
 import { BResult, ConnectionDefinitions } from '@event-inc/types';
@@ -58,6 +59,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
       platform,
       configuration,
       features,
+      buildKitIntegration,
     }: {
       platform?: Platform;
       configuration?: {
@@ -65,6 +67,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
         CLIENT_SECRET: string;
       };
       features?: Feature[];
+      buildKitIntegration?: BuildKitIntegration;
     }): Promise<BResult<boolean, 'service', unknown>> {
       try {
         const settingsRecord = (await _list()).unwrap().rows[0] as Settings;
@@ -112,11 +115,32 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
             }
           }
 
+          if (buildKitIntegration) {
+             if (!settingsRecord.buildKitIntegrations) {
+              settingsRecord.buildKitIntegrations = [];
+            }
+
+            if (buildKitIntegration.active) {
+              settingsRecord.buildKitIntegrations.push({
+                connectionDefinitionId: buildKitIntegration.connectionDefinitionId,
+                environment: buildKitIntegration.environment,
+                platformName: buildKitIntegration.platformName,
+              });
+            } else {
+              settingsRecord.buildKitIntegrations = settingsRecord.buildKitIntegrations.filter(
+                integration => 
+                  !(integration.connectionDefinitionId === buildKitIntegration.connectionDefinitionId && 
+                    integration.environment === buildKitIntegration.environment)
+              );
+            }
+          }
+
           await updateById(settingsRecord._id, {
             connectedPlatforms: settingsRecord.connectedPlatforms,
             updatedAt: new Date().getTime(),
             updatedDate: new Date().toISOString(),
             features: features?.length ? features : settingsRecord.features,
+            buildKitIntegrations: settingsRecord.buildKitIntegrations || [],
           });
 
           return resultOk(true);
@@ -126,6 +150,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
           ownership,
           platforms: [platform],
           features: [],
+          buildKitIntegrations: []
         });
 
         await _create<Settings>('st', settings);
@@ -177,6 +202,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
           ownership,
           platforms,
           features: [],
+          buildKitIntegrations: [],
         });
 
         await _create<Settings>('st', settings);

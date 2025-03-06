@@ -9,10 +9,16 @@ export const generateSettingsRecord = ({
   ownership,
   features,
   platforms,
+  buildKitIntegrations,
 }: {
   ownership: Ownership;
   features?: Feature[];
   platforms: Platform[];
+  buildKitIntegrations?: {
+    connectionDefinitionId: string;
+    platformName: string;
+    environment: 'test' | 'live';
+  }[]
 }): Settings => {
   return {
     createdAt: Date.now(),
@@ -22,5 +28,6 @@ export const generateSettingsRecord = ({
     updatedDate: new Date(),
     connectedPlatforms: platforms,
     features,
+    buildKitIntegrations,
   };
 };
