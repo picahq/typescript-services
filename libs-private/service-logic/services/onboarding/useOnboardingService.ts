@@ -38,6 +38,7 @@ export const useOnboardingService = (ctx: Context, ownership: Ownership) => {
         const billing = {
           throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
           customerId: response?.customer?.id,
+          buildKitIntegrationLimit: parseInt(process.env.DEFAULT_CLIENT_BUILDKIT_INTEGRATION_LIMIT) || 3,
           subscription: {
             id: response?.subscription?.id,
             endDate: response?.subscription?.current_period_end,

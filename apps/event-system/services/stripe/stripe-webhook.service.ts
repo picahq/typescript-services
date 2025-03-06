@@ -23,6 +23,7 @@ export default {
 
   actions: {
     async handleWebhook(ctx: any) {
+
       try {
         const rawBody = ctx?.options?.parentCtx?.params?.req?.rawBody;
         const signature = ctx?.meta?.request?.headers['stripe-signature'];
@@ -63,6 +64,7 @@ export default {
           if (key && subscriptionCreated?.status === 'active') {
             const billing = {
               throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
+              buildKitIntegrationLimit: parseInt(process.env.DEFAULT_CLIENT_BUILDKIT_INTEGRATION_LIMIT) || 3,
               provider: 'stripe',
               customerId: subscriptionCreated?.customer,
               subscription: {
@@ -105,6 +107,7 @@ export default {
 
             const billing = {
               throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
+              buildKitIntegrationLimit: parseInt(process.env.DEFAULT_CLIENT_BUILDKIT_INTEGRATION_LIMIT) || 3,
               provider: 'stripe',
               customerId: subscriptionUpdated?.customer,
               subscription: {
@@ -162,6 +165,7 @@ export default {
   
               const updatedBilling = {
                 throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
+                buildKitIntegrationLimit: parseInt(process.env.DEFAULT_CLIENT_BUILDKIT_INTEGRATION_LIMIT) || 3,
                 provider: 'stripe',
                 customerId: subscriptionCreated?.customer,
                 subscription: {
