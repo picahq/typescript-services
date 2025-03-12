@@ -39,18 +39,50 @@ export default {
           endpointSecret
         );
 
-        function analyzeSubscription(subscriptionData: Stripe.SubscriptionItem[]): string {
+        function analyzeSubscription(subscriptionData: Stripe.SubscriptionItem[]): {
+          key: string,
+          buildKitIntegrationLimit: number,
+          buildKitUsageLimit: number,
+          chatUsageLimit: number,
+        } {
           const priceIds = new Set(subscriptionData.map((item) => item.price.id));
 
           if (priceIds.has(process.env.STRIPE_PRO_PLAN_PRICE_ID)) {
-            return 'sub::pro';
+
+            const price = subscriptionData.find((item) => item.price.id === process.env.STRIPE_PRO_PLAN_PRICE_ID);
+            const buildKitIntegrationLimit = price?.plan?.metadata?.buildKitIntegrationLimit;
+            const buildKitUsageLimit = price?.plan?.metadata?.buildKitUsageLimit;
+            const chatUsageLimit = price?.plan?.metadata?.chatUsageLimit;
+
+            return {
+              key: 'sub::pro',
+              buildKitIntegrationLimit: parseInt(buildKitIntegrationLimit) || 10,
+              buildKitUsageLimit: parseInt(buildKitUsageLimit) || 50,
+              chatUsageLimit: parseInt(chatUsageLimit) || 500,
+            };
           }
 
           if (priceIds.has(process.env.STRIPE_FREE_PLAN_PRICE_ID)) {
-            return 'sub::free';
+            const price = subscriptionData.find((item) => item.price.id === process.env.STRIPE_FREE_PLAN_PRICE_ID);
+
+            const buildKitIntegrationLimit = price?.plan?.metadata?.buildKitIntegrationLimit;
+            const buildKitUsageLimit = price?.plan?.metadata?.buildKitUsageLimit;
+            const chatUsageLimit = price?.plan?.metadata?.chatUsageLimit;
+
+            return {
+              key: 'sub::free',
+              buildKitIntegrationLimit: parseInt(buildKitIntegrationLimit) || 3,
+              buildKitUsageLimit: parseInt(buildKitUsageLimit) || 10,
+              chatUsageLimit: parseInt(chatUsageLimit) || 50,
+            };
           }
 
-          return "sub::unknown";
+          return {
+            key: 'sub::unknown',
+            buildKitIntegrationLimit: 3,
+            buildKitUsageLimit: 10,
+            chatUsageLimit: 50,
+          };
 
         }
 
@@ -59,12 +91,14 @@ export default {
           case 'customer.subscription.created':
 
           const subscriptionCreated = event.data.object;
-          const key = analyzeSubscription(event.data.object?.items?.data);
+          const { key, buildKitIntegrationLimit, buildKitUsageLimit, chatUsageLimit } = analyzeSubscription(event.data.object?.items?.data);
 
           if (key && subscriptionCreated?.status === 'active') {
             const billing = {
               throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
-              buildKitIntegrationLimit: parseInt(process.env.DEFAULT_CLIENT_BUILDKIT_INTEGRATION_LIMIT) || 3,
+              buildKitIntegrationLimit,
+              buildKitUsageLimit,
+              chatUsageLimit,
               provider: 'stripe',
               customerId: subscriptionCreated?.customer,
               subscription: {
@@ -103,11 +137,18 @@ export default {
           case 'customer.subscription.updated':
             const subscriptionUpdated = event.data.object;
 
-            const subscriptionKey = analyzeSubscription(subscriptionUpdated?.items?.data);
+            const { 
+              key: subscriptionKey, 
+              buildKitIntegrationLimit: updatedBuildKitIntegrationLimit, 
+              buildKitUsageLimit: updatedBuildKitUsageLimit, 
+              chatUsageLimit: updatedChatUsageLimit 
+            } = analyzeSubscription(subscriptionUpdated?.items?.data);
 
             const billing = {
               throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
-              buildKitIntegrationLimit: parseInt(process.env.DEFAULT_CLIENT_BUILDKIT_INTEGRATION_LIMIT) || 3,
+              buildKitIntegrationLimit: updatedBuildKitIntegrationLimit,
+              buildKitUsageLimit: updatedBuildKitUsageLimit,
+              chatUsageLimit: updatedChatUsageLimit,
               provider: 'stripe',
               customerId: subscriptionUpdated?.customer,
               subscription: {
@@ -165,7 +206,9 @@ export default {
   
               const updatedBilling = {
                 throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
-                buildKitIntegrationLimit: parseInt(process.env.DEFAULT_CLIENT_BUILDKIT_INTEGRATION_LIMIT) || 3,
+                buildKitIntegrationLimit: parseInt((subscriptionCreated as any)?.plan?.metadata?.buildKitIntegrationLimit) || 3,
+                buildKitUsageLimit: parseInt((subscriptionCreated as any)?.plan?.metadata?.buildKitUsageLimit) || 10,
+                chatUsageLimit: parseInt((subscriptionCreated as any)?.plan?.metadata?.chatUsageLimit) || 50,
                 provider: 'stripe',
                 customerId: subscriptionCreated?.customer,
                 subscription: {
@@ -175,7 +218,6 @@ export default {
                   valid: true,
                 },
               };
-  
               const client = await ctx.broker.call(
                 'v1.clients.updateBillingByCustomerId',
                 {
