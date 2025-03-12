@@ -144,7 +144,7 @@ export const useUsageService = (ctx: Context, ownership: Ownership) => {
                 if (!usage || usage.length === 0) {
                     return resultOk({
                         _id: '',
-                        clientId: '',
+                        clientId,
                         createdAt: 0,
                         buildkit: {
                             test: {
