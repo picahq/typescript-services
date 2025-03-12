@@ -38,7 +38,9 @@ export const useOnboardingService = (ctx: Context, ownership: Ownership) => {
         const billing = {
           throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
           customerId: response?.customer?.id,
-          buildKitIntegrationLimit: parseInt(process.env.DEFAULT_CLIENT_BUILDKIT_INTEGRATION_LIMIT) || 3,
+          buildKitIntegrationLimit: parseInt((response?.subscription as any)?.plan?.metadata?.buildKitIntegrationLimit) || 3,
+          buildKitUsageLimit: parseInt((response?.subscription as any)?.plan?.metadata?.buildKitUsageLimit) || 10,
+          chatUsageLimit: parseInt((response?.subscription as any)?.plan?.metadata?.chatUsageLimit) || 50,
           subscription: {
             id: response?.subscription?.id,
             endDate: response?.subscription?.current_period_end,

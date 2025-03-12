@@ -34,6 +34,9 @@ export const internalRoute = () => ({
 
     'v1.early-access.public.create',
 
+    'v1.usage.public.create',
+    'v1.usage.public.get',
+
   ],
   aliases: {
     'POST v3/users/get': 'v3.users.getUserFromToken',
@@ -70,6 +73,10 @@ export const internalRoute = () => ({
 
     // Early Access
     'POST v1/early-access/create': 'v1.early-access.public.create',
+
+    // Usage
+    'POST v1/usage/create': 'v1.usage.public.create',
+    'GET v1/usage/get': 'v1.usage.public.get',
 
   },
   cors: {

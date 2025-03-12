@@ -16,6 +16,7 @@ export const Services = {
   PlatformsOauth: 'v1.platforms-oauth',
   Onboarding: 'v1.onboarding',
   EarlyAccess: 'v1.early-access',
+  Usage: 'v1.usage',
 } as const;
 
 type keys = keyof typeof Services;
