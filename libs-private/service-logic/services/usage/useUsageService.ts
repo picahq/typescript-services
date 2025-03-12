@@ -4,11 +4,22 @@ import { BResult } from "@event-inc/types";
 import { Usage } from "@event-inc/types/usage";
 import { resultErr, resultOk } from "@event-inc/utils";
 import jwt from 'jsonwebtoken';
-import { format } from 'date-fns';
 import { useGenericCRUDService } from "../genericCRUD";
 import { Services } from "@libs-private/data-models";
 
 const SERVICE_NAME = Services.Usage;
+
+const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return {
+        daily: `${year}-${month}-${day}`,
+        monthly: `${year}-${month}`,
+        yearly: `${year}`
+    };
+};
 
 export const useUsageService = (ctx: Context, ownership: Ownership) => {
     const { find, findAndUpdate, updateMany } = useGenericCRUDService(ctx, SERVICE_NAME, ownership, {
@@ -51,10 +62,7 @@ export const useUsageService = (ctx: Context, ownership: Ownership) => {
                 const environment = secretKey.startsWith('sk_live') ? 'live' : 'test';
                 const clientId = decoded?.payload?.buildableId;
                 const currentDate = new Date();
-
-                const dailyKey = format(currentDate, 'yyyy-MM-dd');
-                const monthlyKey = format(currentDate, 'yyyy-MM');
-                const yearlyKey = format(currentDate, 'yyyy');
+                const { daily: dailyKey, monthly: monthlyKey, yearly: yearlyKey } = formatDate(currentDate);
 
                 // First, try to find the existing usage record
                 const existingUsage = (await find<Usage>({ query: { clientId } })).unwrap();
