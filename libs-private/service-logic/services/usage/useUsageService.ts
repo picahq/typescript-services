@@ -3,7 +3,6 @@ import { Ownership } from "@libs-private/data-models";
 import { BResult } from "@event-inc/types";
 import { Usage } from "@event-inc/types/usage";
 import { resultErr, resultOk } from "@event-inc/utils";
-import jwt from 'jsonwebtoken';
 import { useGenericCRUDService } from "../genericCRUD";
 import { Services } from "@libs-private/data-models";
 
@@ -35,7 +34,6 @@ export const useUsageService = (ctx: Context, ownership: Ownership) => {
             try {
                 const headers = (ctx.meta as any).request.headers;
                 const secretKey = headers['x-pica-secret'];
-                const authorization = headers['authorization'];
 
                 if (!secretKey) {
                     return resultErr<'service'>(
@@ -47,20 +45,9 @@ export const useUsageService = (ctx: Context, ownership: Ownership) => {
                     );
                 }
 
-                if (!authorization) {
-                    return resultErr<'service'>(
-                        false,
-                        'service_4000',
-                        'User is not authenticated',
-                        'buildable-core',
-                        false
-                    );
-                }
-
-                const authToken = authorization.split(' ')[1];
-                const decoded = jwt.decode(authToken, { complete: true }) as any;
+                // Get the buildableId from ctx.meta.buildable._id
+                const clientId = (ctx.meta as any).buildable._id;
                 const environment = secretKey.startsWith('sk_live') ? 'live' : 'test';
-                const clientId = decoded?.payload?.buildableId;
                 const currentDate = new Date();
                 const { daily: dailyKey, monthly: monthlyKey, yearly: yearlyKey } = formatDate(currentDate);
 
@@ -121,7 +108,6 @@ export const useUsageService = (ctx: Context, ownership: Ownership) => {
 
                 const headers = (ctx.meta as any).request.headers;
                 const secretKey = headers['x-pica-secret'];
-                const authorization = headers['authorization'];
 
                 if (!secretKey) {
                     return resultErr<'service'>(
@@ -132,20 +118,9 @@ export const useUsageService = (ctx: Context, ownership: Ownership) => {
                         false
                     );
                 }
-
-                if (!authorization) {
-                    return resultErr<'service'>(
-                        false,
-                        'service_4000',
-                        'User is not authenticated',
-                        'buildable-core',
-                        false
-                    );
-                }
-
-                const authToken = authorization.split(' ')[1];
-                const decoded = jwt.decode(authToken, { complete: true }) as any;
-                const clientId = decoded?.payload?.buildableId;
+                
+                // Get the buildableId from ctx.meta.buildable._id
+                const clientId = (ctx.meta as any).buildable?._id;
 
                 const usage = (await find<Usage>({ query: { clientId } })).unwrap();
 
