@@ -322,6 +322,132 @@ module.exports = {
         const { type, code, isTerminal = false } = ctx.params;
 
         const map = {
+          google: async (code: string) => {
+            let accessTokenResult;
+            try {
+              accessTokenResult = await axios({
+                method: 'post',
+                url: 'https://oauth2.googleapis.com/token',
+                headers: {
+                  'Accept': 'application/json',
+                },
+                params: {
+                  client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
+                  client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+                  code,
+                  grant_type: 'authorization_code',
+                  redirect_uri: process.env.GOOGLE_OAUTH_REDIRECT_URI,
+                }
+              });
+            } catch (error) {
+              if (error.response) {
+                console.error(AXIOS_RESPONSE_ERROR);
+                console.error(error.response.data);
+                console.error(error.response.status);
+                console.error(error.response.headers);
+
+                throw new MoleculerError(
+                  'Error occurred calling Google OAuth token endpoint',
+                  error.response.status,
+                  'google-access-token',
+                  error.response.data
+                );
+              } else if (error.request) {
+                console.error(AXIOS_REQUEST_ERROR);
+                console.error(error.request);
+              } else {
+                console.error(AXIOS_REQUEST_SETUP_ERROR);
+                console.error('Error', error.message);
+              }
+
+              throw new MoleculerError(
+                'Something went wrong during Google authentication',
+                500,
+                'google-authentication-error',
+                {}
+              );
+            }
+
+            const access_token = get(accessTokenResult, 'data.access_token');
+            
+            let user;
+            try {
+              user = (await axios({
+                url: 'https://www.googleapis.com/oauth2/v2/userinfo',
+                headers: {
+                  'Authorization': `Bearer ${access_token}`,
+                }
+              })).data;
+            } catch (error) {
+              if (error.response) {
+                console.error(AXIOS_RESPONSE_ERROR);
+                console.error(error.response.data);
+                console.error(error.response.status);
+                console.error(error.response.headers);
+
+                throw new MoleculerError(
+                  'Error occurred trying to retrieve Google user info',
+                  500,
+                  'google-user-retrieval'
+                );
+              } else if (error.request) {
+                console.error(AXIOS_REQUEST_ERROR);
+                console.error(error.request);
+              } else {
+                console.error(AXIOS_REQUEST_SETUP_ERROR);
+                console.error('Error', error.message);
+              }
+
+              throw new MoleculerError(
+                'Something went wrong during Google authentication',
+                500,
+                'google-authentication-error',
+                {}
+              );
+            }
+
+            const email = get(user, 'email');
+
+            // If email is undefined, throw an error
+            if (!email) {
+              throw new MoleculerError(
+                'Google authentication returned an undefined email',
+                500,
+                'google-authentication-error'
+              );
+            }
+
+            // Google API provides verified email status
+            const emails = [{
+              email: email,
+              primary: true,
+              verified: get(user, 'verified_email', false)
+            }];
+
+            // Google doesn't provide username, so we'll create one from email.
+            const username = email.split('@')[0];
+
+            // Google provides given_name and family_name directly
+            const firstName = get(user, 'given_name', '');
+            const lastName = get(user, 'family_name', '');
+          
+            const avatar = get(user, 'picture', '');
+
+            // Google doesn't provide a profile link, so we'll use the avatar
+            const profileLink = avatar;
+
+
+            return {
+              user,
+              emails,
+              email,
+              username,
+              firstName,
+              lastName,
+              avatar,
+              profileLink
+            };
+          },
           github: async (code: any) => {
             let accessTokenResult;
             try {
