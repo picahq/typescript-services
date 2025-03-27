@@ -37,6 +37,8 @@ export const internalRoute = () => ({
     'v1.usage.public.create',
     'v1.usage.public.get',
 
+    'v3.users.sign',
+
   ],
   aliases: {
     'POST v3/users/get': 'v3.users.getUserFromToken',
@@ -77,6 +79,9 @@ export const internalRoute = () => ({
     // Usage
     'POST v1/usage/create': 'v1.usage.public.create',
     'GET v1/usage/get': 'v1.usage.public.get',
+
+    // Users
+    'POST v3/users/create': 'v3.users.sign',
 
   },
   cors: {

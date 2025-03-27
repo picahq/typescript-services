@@ -94,7 +94,8 @@ const RUST_INTERNAL_API_ENDPOINTS = {
 const generate_default_event_access_record = (
   env: string,
   buildableId: string,
-  userId: string
+  userId: string,
+  organizationId?: string
 ) => {
   return {
     name: `default-${env}-key`.toUpperCase(),
@@ -112,7 +113,7 @@ const generate_default_event_access_record = (
       buildableId,
       userId,
       projectId: buildableId,
-      organizationId: buildableId,
+      organizationId: organizationId || buildableId,
       clientId: buildableId,
     },
   };
@@ -911,6 +912,84 @@ module.exports = {
         }
       },
     },
+
+    sign: {
+      params: {
+        email: {
+          type: 'email',
+        },
+      },
+      async handler(ctx: any) {
+        try {
+          const { email } = ctx.params;
+          
+          // Create the username from the email
+          const username = ctx.params.email.split('@')[0];
+
+          // Creat the emails
+          const emails = [
+            {
+              email,
+              primary: true,
+              verified: true,
+            },
+          ];
+
+          // Let the firstName and lastName be the same as the email
+          const firstName = ctx.params.email;
+          const lastName = ctx.params.email;
+
+          // Let the avatar be empty
+          const avatar = '';
+
+          // Let the profileLink be empty
+          const profileLink = '';
+          
+          let _user;
+
+          _user = await this.createOrUpdateUser({
+            ctx,
+            provider: 'programmatic',
+            emails,
+            email,
+            username,
+            firstName,
+            lastName,
+            avatar,
+            profileLink,
+            organizationId: ctx?.meta?.buildable?._id,
+          });
+
+          const { _id, email: _email, userKey, firstName: _firstName, lastName: _lastName, state, pointers } = _user;
+
+          const buildableId = get(_user, 'client.buildableId');
+          const containerId = get(_user, 'client.containers[0]._id');
+
+          const token = this.createToken({
+            _id,
+            email: _email,
+            username,
+            userKey,
+            buildableId,
+            containerId,
+            firstName: _firstName,
+            lastName: _lastName,
+            pointers,
+          });
+
+          return {
+            token,
+            state,
+          };
+
+        }
+        catch (error) {
+          console.error(error);
+          throw new AuthGenericError();
+        }
+      }
+    },
+
     mockOauth: {
       params: {
         user: {
@@ -1055,6 +1134,7 @@ module.exports = {
       ctx,
       provider,
       user,
+      organizationId,
       emails,
       email,
       username,
@@ -1066,6 +1146,7 @@ module.exports = {
       const updateUser = async (_user: any) => {
         const profile = get(_user, 'profile');
         const accessList = get(_user, 'accessList');
+        const _organizationId = get(_user, 'organizationId') ? get(_user, 'organizationId') : organizationId;
         const _firstName = get(_user, 'firstName')
           ? get(_user, 'firstName')
           : firstName;
@@ -1106,6 +1187,7 @@ module.exports = {
           firstName: _firstName,
           lastName: _lastName,
           accessList,
+          organizationId: _organizationId,
           username: _user.username ? _user.username : username,
           userKey: _user.userKey
             ? _user.userKey
@@ -1221,6 +1303,7 @@ module.exports = {
             ],
             createdAt: Date.now(),
             createdDate: new Date(),
+            organizationId,
           });
 
           const client = await ctx.broker.call('v1.clients.create', {
@@ -1252,7 +1335,8 @@ module.exports = {
             data: generate_default_event_access_record(
               'test',
               client.buildableId,
-              _user._id
+              _user._id,
+              organizationId,
             ),
           });
 
@@ -1266,7 +1350,8 @@ module.exports = {
             data: generate_default_event_access_record(
               'live',
               client.buildableId,
-              _user._id
+              _user._id,
+              organizationId
             ),
           });
 
