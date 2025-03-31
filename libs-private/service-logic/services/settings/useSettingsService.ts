@@ -40,6 +40,13 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
     }
   );
 
+  const { updateMany } = useGenericCRUDService(
+    ctx,
+    SERVICE_NAME,
+    ownership,
+    { DISABLE_ADDING_OWNERSHIP_CHECK: true }
+  );
+
   return {
     find,
     async get(props: FindRequest = {}): Promise<BResult<Settings, 'service'>> {
@@ -135,13 +142,40 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
             }
           }
 
-          await updateById(settingsRecord._id, {
+          const updatedValues = {
             connectedPlatforms: settingsRecord.connectedPlatforms,
-            updatedAt: new Date().getTime(),
-            updatedDate: new Date().toISOString(),
             features: features?.length ? features : settingsRecord.features,
             buildKitIntegrations: settingsRecord.buildKitIntegrations || [],
-          });
+            updatedAt: new Date().getTime(),
+            updatedDate: new Date().toISOString(),
+          };
+
+          const result = await updateById(settingsRecord._id, updatedValues);
+
+          if (!result.ok) {
+            console.error(`Failed to update settings record ${settingsRecord._id}`);
+          }
+
+          if (result.ok) {
+            // Update all settings records with the same organizationId but different buildableId in one operation
+            const updateResult = await updateMany({
+              query: {
+                "ownership.organizationId": ownership.organizationId,
+                "ownership.buildableId": { "$ne": ownership.buildableId }
+              },
+              update: {
+                $set: {
+                  connectedPlatforms: updatedValues.connectedPlatforms,
+                  features: updatedValues.features,
+                  buildKitIntegrations: updatedValues.buildKitIntegrations,
+                }
+              }
+            });
+
+            if (!updateResult.ok) {
+              console.error('Failed to update multiple settings records');
+            }
+          }
 
           return resultOk(true);
         }

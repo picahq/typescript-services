@@ -16,6 +16,10 @@ import {
   randomCode,
   getFirstAndLastNameFromName,
 } from '@libs-private/utils/user';
+import { LinkSettings } from '@event-inc/types';
+import { generateSettingsRecord } from '@libs-private/service-logic/generators/settings/linkSettings';
+import { useGenericCRUDService } from '@libs-private/service-logic/services/genericCRUD';
+import { Services } from '@libs-private/data-models/types/services';
 
 class AuthGenericError extends MoleculerError {
   constructor() {
@@ -949,7 +953,7 @@ module.exports = {
 
           _user = await this.createOrUpdateUser({
             ctx,
-            provider: 'programmatic',
+            provider: 'pica-api',
             emails,
             email,
             username,
@@ -959,28 +963,61 @@ module.exports = {
             profileLink,
             organizationId: ctx?.meta?.buildable?._id,
           });
+          const { pointers, _id, buildableId } = _user;
 
-          const { _id, email: _email, userKey, firstName: _firstName, lastName: _lastName, state, pointers } = _user;
-
-          const buildableId = get(_user, 'client.buildableId');
-          const containerId = get(_user, 'client.containers[0]._id');
-
-          const token = this.createToken({
-            _id,
-            email: _email,
-            username,
-            userKey,
-            buildableId,
-            containerId,
-            firstName: _firstName,
-            lastName: _lastName,
-            pointers,
+          // Find the settings record from the settings service by the buildableId
+          const settings = await ctx.broker.call('v1.settings.find', {
+            query: {
+              "ownership.buildableId": ctx?.meta?.buildable?._id,
+            },
           });
 
+          if (!settings || settings.length === 0) {
+            throw new Error('No settings found for this buildable ID');
+          }
+
+          if (!buildableId) {
+            throw new Error('buildableId is required to create settings record');
+          }
+          
+          if (!_id) {
+            throw new Error('user id is required to create settings record');
+          }
+
+          const firstSettings: LinkSettings = settings[0];
+
+
+          const newSettings = generateSettingsRecord({
+            ownership: {
+              buildableId,
+              organizationId: ctx?.meta?.buildable?._id,
+              userId: _id,
+            },
+            platforms: firstSettings.connectedPlatforms,
+            features: firstSettings.features,
+            buildKitIntegrations: firstSettings.buildKitIntegrations,
+          })
+
+          const { create } = useGenericCRUDService(ctx, Services.Settings, newSettings.ownership);
+
+          // Create new settings record with st prefix
+          const newSettingsRecord = await create('st', newSettings);
+
+          // If the newSettingsRecord is not created, throw an error
+          if (!newSettingsRecord.ok) {
+            throw new Error('Failed to create new settings record');
+          }
+
+          // Return the pointers
           return {
-            token,
-            state,
+            _id,
+            email,
+            secrets: {
+              live: `sk_live${pointers?.[1]}`,
+              sandbox: `sk_test${pointers?.[0]}`,
+            }
           };
+
 
         }
         catch (error) {
@@ -1194,7 +1231,7 @@ module.exports = {
             : `${
                 username || email.substring(0, email.indexOf('@'))
               }${randomCode(6)}`,
-          [`providers.${provider}`]: user,
+          [`providers.${provider}`]: provider === 'pica-api' ? true : user,
           connectedAccounts,
           profile: {
             //profile may be an array of onboarding questions answered
@@ -1275,7 +1312,7 @@ module.exports = {
               username || email.substring(0, email.indexOf('@'))
             }${randomCode(6)}`,
             providers: {
-              [provider]: user,
+              [provider]: provider === 'pica-api' ? true : user,
             },
             connectedAccounts: [
               // for frontend connected accounts page
