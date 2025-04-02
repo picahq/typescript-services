@@ -153,6 +153,11 @@ const collectionsWithIndexes: Record<string, IndexSpecification[]> = {
   ],
   settings: [
     { field: { "ownership.clientId": 1 }, name: "ownership.clientId_1" },
+    {
+      field: { "ownership.buildableId": 1 },
+      name: "ownership.buildableId_1",
+      unique: true
+    },
     { field: { deleted: 1 }, name: "deleted_1" },
     { field: { active: 1 }, name: "active_1" },
     { field: { createdAt: 1 }, name: "createdAt_1" },
