@@ -39,10 +39,10 @@ export class AuthKitToken {
      * @remarks It is recommended to avoid using spaces and colons in this field as it may lead to unexpected behavior in some systems.
      */
     identity?: string;
-    identityType?: "user" | "team" | "organization";
-     /** @deprecated Use 'identity' instead */
+    identityType?: "user" | "team" | "organization" | "project";
+    /** @deprecated Use 'identity' instead */
     group?: string;
-     /** @deprecated */
+    /** @deprecated */
     label?: string;
   }) {
     const secret = this._clientInfo.secret;

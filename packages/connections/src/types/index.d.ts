@@ -18,7 +18,7 @@ export interface EventLink {
   version: string;
   ownership: Ownership;
   identity?: string;
-  identityType?: 'user' | 'team' | 'organization';
+  identityType?: 'user' | 'team' | 'organization' | 'project';
   group?: string;
   label?: string;
   token: string;
@@ -37,7 +37,7 @@ export type CreateEventLinkPayload = {
   environment?: string;
   usageSource?: string;
   identity?: string;
-  identityType?: 'user' | 'team' | 'organization';
+  identityType?: 'user' | 'team' | 'organization' | 'project';
   group?: string;
   label?: string;
 };
@@ -123,34 +123,34 @@ export interface Feature {
 }
 
 export interface ConnectionRecord {
-	_id: string;
-	platformVersion: string;
-	connectionDefinitionId: string;
-	name: string;
-	key: string;
-	environment: string;
-	platform: string;
-	secretsServiceId: string;
-	settings: {
-		parseWebhookBody: boolean;
-		showSecret: boolean;
-		allowCustomEvents: boolean;
-		oauth: boolean;
-	};
-	throughput: {
-		key: string;
-		limit: number;
-	};
-	createdAt: number;
-	updatedAt: number;
-	updated: boolean;
-	version: string;
-	lastModifiedBy: string;
-	deleted: boolean;
-	changeLog: Record<string, any>; // You can replace 'any' with a more specific type if needed
-	tags: string[];
-	active: boolean;
-	deprecated: boolean;
+  _id: string;
+  platformVersion: string;
+  connectionDefinitionId: string;
+  name: string;
+  key: string;
+  environment: string;
+  platform: string;
+  secretsServiceId: string;
+  settings: {
+    parseWebhookBody: boolean;
+    showSecret: boolean;
+    allowCustomEvents: boolean;
+    oauth: boolean;
+  };
+  throughput: {
+    key: string;
+    limit: number;
+  };
+  createdAt: number;
+  updatedAt: number;
+  updated: boolean;
+  version: string;
+  lastModifiedBy: string;
+  deleted: boolean;
+  changeLog: Record<string, any>; // You can replace 'any' with a more specific type if needed
+  tags: string[];
+  active: boolean;
+  deprecated: boolean;
 }
 
 
@@ -162,7 +162,7 @@ export interface EmbedTokenRecord {
   group?: string;
   label?: string;
   identity?: string;
-  identityType?: 'user' | 'team' | 'organization';
+  identityType?: 'user' | 'team' | 'organization' | 'project';
   createdAt: number;
   createdDate: Date;
   updatedAt?: number;
@@ -170,13 +170,13 @@ export interface EmbedTokenRecord {
   environment: string;
   features?: Feature[];
   sessionId: string;
-	_id?: string;
-	formData?: object;
-	response?: {
-        isConnected: boolean;
-        message?: string;
-        connection?: ConnectionRecord;
-    }
+  _id?: string;
+  formData?: object;
+  response?: {
+    isConnected: boolean;
+    message?: string;
+    connection?: ConnectionRecord;
+  }
 }
 
 export interface LinkSettings {

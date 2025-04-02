@@ -10,7 +10,7 @@ export type CreateEventLinkPayload = {
   environment?: string;
   usageSource?: string;
   identity?: string;
-  identityType?: 'user' | 'team' | 'organization';
+  identityType?: 'user' | 'team' | 'organization' | 'project';
   group?: string;
   label?: string;
 };
@@ -20,7 +20,7 @@ export interface EventLink {
   version: string;
   ownership: Ownership;
   identity?: string;
-  identityType?: 'user' | 'team' | 'organization';
+  identityType?: 'user' | 'team' | 'organization' | 'project';
   group?: string;
   label?: string;
   token: string;

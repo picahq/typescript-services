@@ -27,7 +27,7 @@ export interface EmbedTokensPayload {
   label?: string;
   group?: string;
   identity?: string;
-  identityType?: 'user' | 'team' | 'organization';
+  identityType?: 'user' | 'team' | 'organization' | 'project';
   environment: string;
   ttl: number;
   sessionId: string;
@@ -41,7 +41,7 @@ export interface EmbedTokenRecord {
   };
   features?: Feature[];
   identity?: string;
-  identityType?: 'user' | 'team' | 'organization';
+  identityType?: 'user' | 'team' | 'organization' | 'project';
   label?: string;
   group?: string;
   createdAt: number;
