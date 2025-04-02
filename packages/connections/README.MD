@@ -33,7 +33,7 @@ app.post("/authkit-token", async (request, response) => {
 
 You'll want to switch out the API Key for your own, which will later tell your frontend which integrations you'd like to make available to your users.
 
-If you pass an `identity` or `identityType` (`user`, `team`, or `organization`), you'll be able to query for all connections scoped to that identity. The identity is used to generate the unique [Connection Key](https://docs.picaos.com/docs/setup) for the user once they successfully connect an account.
+If you pass an `identity` or `identityType` (`user`, `team`, `organization`, or `project`), you'll be able to query for all connections scoped to that identity. The identity is used to generate the unique [Connection Key](https://docs.picaos.com/docs/setup) for the user once they successfully connect an account.
 
 ## Full Documentation
 
