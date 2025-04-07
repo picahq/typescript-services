@@ -1018,7 +1018,7 @@ module.exports = {
 
           if (!buildableId) {
             throw new MoleculerError(
-              'Missing required buildableId for settings configuration',
+              'buildableId is required to create settings record',
               500,
               'missing-buildable-id'
             );
@@ -1026,7 +1026,7 @@ module.exports = {
           
           if (!_id) {
             throw new MoleculerError(
-              'Missing required user ID for settings configuration',
+              '_id is required to create settings record',
               500,
               'missing-user-id'
             );
