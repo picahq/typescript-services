@@ -917,7 +917,7 @@ module.exports = {
       },
     },
 
-    sign: {
+    createOrGet: {
       params: {
         email: {
           type: 'email',
@@ -926,14 +926,16 @@ module.exports = {
       async handler(ctx: any) {
         try {
           const { email } = ctx.params;
+          const _buildableId = ctx?.meta?.buildable?._id;
+          const emailWithOrganizationId = `${_buildableId}-${email}`;
           
           // Create the username from the email
-          const username = ctx.params.email.split('@')[0];
+          const username = emailWithOrganizationId.split('@')[0];
 
           // Creat the emails
           const emails = [
             {
-              email,
+              email: emailWithOrganizationId,
               primary: true,
               verified: true,
             },
@@ -951,17 +953,51 @@ module.exports = {
           
           let _user;
 
+          const user = (await ctx.broker.call('v3.users.find', {
+            query: { buildableId: _buildableId },
+            pageSize: 1,
+          }))[0];
+
+          if (user?.providers?.["pica-api"]) {
+            throw new MoleculerError(
+              'This user was created programmatically so it cannot be used to create a new user',
+              400,
+              'programmatic-user-error',
+              {}
+            );
+          }
+
+          const existingUser = (await ctx.broker.call('v3.users.find', {
+            query: { email: emailWithOrganizationId },
+            pageSize: 1,
+          }))[0];
+
+          if (existingUser) {
+
+            const { pointers, _id } = existingUser;
+
+            return {
+              _id,
+              email,
+              secrets: {
+                live: `sk_live${pointers?.[1]}`,
+                sandbox: `sk_test${pointers?.[0]}`,
+              }
+            }
+
+          }
+
           _user = await this.createOrUpdateUser({
             ctx,
             provider: 'pica-api',
             emails,
-            email,
+            email: emailWithOrganizationId,
             username,
             firstName,
             lastName,
             avatar,
             profileLink,
-            organizationId: ctx?.meta?.buildable?._id,
+            organizationId: _buildableId,
           });
           const { pointers, _id, buildableId } = _user;
 
@@ -973,15 +1009,27 @@ module.exports = {
           });
 
           if (!settings || settings.length === 0) {
-            throw new Error('No settings found for this buildable ID');
+            throw new MoleculerError(
+              'No settings configuration found for the organization',
+              500,
+              'settings-not-found'
+            );
           }
 
           if (!buildableId) {
-            throw new Error('buildableId is required to create settings record');
+            throw new MoleculerError(
+              'Missing required buildableId for settings configuration',
+              500,
+              'missing-buildable-id'
+            );
           }
           
           if (!_id) {
-            throw new Error('user id is required to create settings record');
+            throw new MoleculerError(
+              'Missing required user ID for settings configuration',
+              500,
+              'missing-user-id'
+            );
           }
 
           const firstSettings: LinkSettings = settings[0];
@@ -1022,6 +1070,9 @@ module.exports = {
         }
         catch (error) {
           console.error(error);
+          if (error instanceof MoleculerError) {
+            throw error;
+          }
           throw new AuthGenericError();
         }
       }
