@@ -960,7 +960,7 @@ module.exports = {
 
           if (user?.providers?.["pica-api"]) {
             throw new MoleculerError(
-              'This user was created programmatically so it cannot be used to create a new user',
+              'This user does not have access to create a new user',
               400,
               'programmatic-user-error',
               {}
