@@ -55,6 +55,7 @@ const collectionsWithIndexes: Record<string, IndexSpecification[]> = {
     { field: { deleted: 1 }, name: "deleted_1" },
     { field: { active: 1 }, name: "active_1" },
     { field: { createdAt: 1 }, name: "createdAt_1" },
+    { field: { connectionPlatform: 1, deleted: 1, createdAt: -1 }, name: "connectionPlatform_1_deleted_1_createdAt_-1" },
   ],
   "connection-model-schema": [
     { field: { key: 1 }, unique: true, name: "key_1" },
@@ -86,7 +87,7 @@ const collectionsWithIndexes: Record<string, IndexSpecification[]> = {
     { field: { createdAt: 1 }, name: "createdAt_1" },
     { field: { deleted: 1, key: 1, "ownership.buildableId": 1 }, name: "deleted_1_key_1_ownership.buildableId_1" },
     { field: { accessKey: 1, deleted: 1, environment: 1, "ownership.buildableId": 1, createdAt: -1 }, name: "deleted_1_environment_1_ownership.buildableId_1_createdAt_-1" },
-
+    { field: { key: 1, "ownership.buildableId": 1 }, name: "key_1_ownership.buildableId_1" },
   ],
   "event-transactions": [
     {
