@@ -85,7 +85,8 @@ const collectionsWithIndexes: Record<string, IndexSpecification[]> = {
     { field: { active: 1 }, name: "active_1" },
     { field: { createdAt: 1 }, name: "createdAt_1" },
     { field: { deleted: 1, key: 1, "ownership.buildableId": 1 }, name: "deleted_1_key_1_ownership.buildableId_1" },
-    { field: { deleted: 1, environment: 1, "ownership.buildableId": 1, createdAt: -1 }, name: "deleted_1_environment_1_ownership.buildableId_1_createdAt_-1" },
+    { field: { accessKey: 1, deleted: 1, environment: 1, "ownership.buildableId": 1, createdAt: -1 }, name: "deleted_1_environment_1_ownership.buildableId_1_createdAt_-1" },
+
   ],
   "event-transactions": [
     {
