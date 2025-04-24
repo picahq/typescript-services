@@ -929,8 +929,7 @@ module.exports = {
           const _buildableId = ctx?.meta?.buildable?._id;
           const emailWithOrganizationId = `${_buildableId}-${email}`;
           
-          // Create the username from the email
-          const username = emailWithOrganizationId.split('@')[0];
+          const username = emailWithOrganizationId;
 
           // Creat the emails
           const emails = [
