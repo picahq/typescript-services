@@ -207,7 +207,7 @@ export const useSettingsService = (ctx: Context, ownership: Ownership) => {
       try {
         const connectionDefinitions = await makeHttpNetworkCall<ConnectionDefinitions>({
           method: 'GET',
-          url: `${LIST_CONNECTION_DEFINITIONS_URL}?limit=100&skip=0&active=true`,
+          url: `${LIST_CONNECTION_DEFINITIONS_URL}?limit=1000&skip=0&active=true`,
         });
 
         const { data } =

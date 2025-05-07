@@ -52,7 +52,7 @@ export const createEventLinkTokenApi = async (
     const connectionDefinitionUrl = `${apiBaseUrl}/public/connection-definitions`;
 
     const connectionDefinitions = await axios.get<ConnectionDefinitions>(
-      `${connectionDefinitionUrl}?limit=100&skip=0`
+      `${connectionDefinitionUrl}?limit=1000&skip=0`
     );
 
     const isLiveSecret = secret.includes('sk_live');

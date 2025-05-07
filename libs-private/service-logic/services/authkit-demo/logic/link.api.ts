@@ -47,7 +47,7 @@ export const createEventLinkTokenApi = async (
   const connectionDefinitions =
     await makeHttpNetworkCall<ConnectionDefinitions>({
       method: 'GET',
-      url: `${connectionDefinitionUrl}?limit=100&skip=0`,
+      url: `${connectionDefinitionUrl}?limit=1000&skip=0`,
     });
 
   const { data: connectionDefinitionsData } = matchResultAndHandleHttpError(
