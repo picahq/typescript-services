@@ -334,7 +334,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       // Get all connection definitions
       const connectionDefinitions =
         await makeHttpNetworkCall<ConnectionDefinitions>({
-          url: `${url}?limit=100&skip=0&active=true`,
+          url: `${url}?limit=1000&skip=0&active=true`,
           method: 'GET',
         });
       const { data: activeConnectionDefinitionsData } =
@@ -457,7 +457,7 @@ export const useEventLinksService = (ctx: Context, ownership: Ownership) => {
       // Get all connection definitions
       const connectionDefinitions =
         await makeHttpNetworkCall<ConnectionDefinitions>({
-          url: `${url}?limit=100&skip=0&active=true`,
+          url: `${url}?limit=1000&skip=0&active=true`,
           method: 'GET',
         });
       const { data: activeConnectionDefinitionsData } =
