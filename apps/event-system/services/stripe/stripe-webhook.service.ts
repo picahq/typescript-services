@@ -88,104 +88,6 @@ export default {
 
         switch (event.type) {
 
-          case 'customer.subscription.created':
-
-          const subscriptionCreated = event.data.object;
-          const { key, buildKitIntegrationLimit, buildKitUsageLimit, chatUsageLimit } = analyzeSubscription(event.data.object?.items?.data);
-
-          if (key && subscriptionCreated?.status === 'active') {
-            const billing = {
-              throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
-              buildKitIntegrationLimit,
-              buildKitUsageLimit,
-              chatUsageLimit,
-              provider: 'stripe',
-              customerId: subscriptionCreated?.customer,
-              subscription: {
-                id: subscriptionCreated.id,
-                endDate: subscriptionCreated.current_period_end,
-                valid: true,
-                key,
-              }
-            }
-
-            const client = await ctx.broker.call('v1.clients.updateBillingByCustomerId', {
-              customerId: subscriptionCreated?.customer,
-              billing
-            });
-
-            await makeHttpNetworkCall({
-              url: TRACK_EVENT,
-              method: 'POST',
-              data: {
-                path: 't',
-                data: {
-                  event: 'Created Subscription',
-                  properties: {
-                    ...subscriptionCreated,
-                    version: "pica-1.0.0"
-                  },
-                  context,
-                  userId: client?.author?._id
-                }
-              }
-            });
-          }
-
-          break;
-
-          case 'customer.subscription.updated':
-            const subscriptionUpdated = event.data.object;
-
-            const { 
-              key: subscriptionKey, 
-              buildKitIntegrationLimit: updatedBuildKitIntegrationLimit, 
-              buildKitUsageLimit: updatedBuildKitUsageLimit, 
-              chatUsageLimit: updatedChatUsageLimit 
-            } = analyzeSubscription(subscriptionUpdated?.items?.data);
-
-            const billing = {
-              throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
-              buildKitIntegrationLimit: updatedBuildKitIntegrationLimit,
-              buildKitUsageLimit: updatedBuildKitUsageLimit,
-              chatUsageLimit: updatedChatUsageLimit,
-              provider: 'stripe',
-              customerId: subscriptionUpdated?.customer,
-              subscription: {
-                id: subscriptionUpdated?.id,
-                endDate: subscriptionUpdated?.current_period_end,
-                valid: true,
-                key: subscriptionKey,
-              },
-            };
-
-            const updatedClient = await ctx.broker.call(
-              'v1.clients.updateBillingByCustomerId',
-              {
-                customerId: subscriptionUpdated?.customer,
-                billing,
-              }
-            );
-
-            await makeHttpNetworkCall({
-              url: TRACK_EVENT,
-              method: 'POST',
-              data: {
-                path: 't',
-                data: {
-                  event: 'Updated Subscription',
-                  properties: {
-                    ...subscriptionUpdated,
-                    version: "pica-1.0.0"
-                  },
-                  context,
-                  userId: updatedClient?.author?._id,
-                }
-              }
-            });
-
-            break;
-
           case 'customer.subscription.deleted':
             const subscriptionDeleted = event.data.object;
 
@@ -213,6 +115,7 @@ export default {
                 customerId: subscriptionCreated?.customer,
                 subscription: {
                   id: subscriptionCreated?.id,
+                  startDate: subscriptionCreated?.current_period_start,
                   endDate: subscriptionCreated?.current_period_end,
                   key: 'sub::free',
                   valid: true,
@@ -315,13 +218,29 @@ export default {
               invoicePaymentSucceeded?.subscription as string
             );
 
-            const succeededInvoiceClient = await ctx.broker.call(
-              'v1.clients.updateOnInvoicePaymentSuccess',
-              {
-                customerId: invoicePaymentSucceeded?.customer,
+            const { key, buildKitIntegrationLimit, buildKitUsageLimit, chatUsageLimit } = analyzeSubscription(subscription?.items?.data);
+
+
+            const billing = {
+              throughput: parseInt(process.env.DEFAULT_CLIENT_THROUGHPUT) || 500,
+              buildKitIntegrationLimit,
+              buildKitUsageLimit,
+              chatUsageLimit,
+              provider: 'stripe',
+              customerId: subscription?.customer,
+              subscription: {
+                id: subscription?.id,
+                startDate: subscription?.current_period_start,
                 endDate: subscription?.current_period_end,
+                valid: true,
+                key,
               }
-            );
+            }
+
+            const updatedClient = await ctx.broker.call('v1.clients.updateBillingByCustomerId', {
+              customerId: subscription?.customer,
+              billing
+            })
 
             await makeHttpNetworkCall({
               url: TRACK_EVENT,
@@ -335,7 +254,7 @@ export default {
                     version: "pica-1.0.0"
                   },
                   context,
-                  userId: succeededInvoiceClient?.author?._id,
+                  userId: updatedClient?.author?._id,
                 }
               }
             });
