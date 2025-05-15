@@ -1,6 +1,6 @@
 {
   "name": "@picahq/authkit-node",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Secure token generation for Pica AuthKit",
   "main": "dist/index.js",
   "scripts": {
@@ -19,7 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/ramda": "^0.28.22",
-    "axios": "^0.26.1",
+    "axios": "^1.6.7",
     "jsonwebtoken": "^9.0.1",
     "jwt-decode": "^3.1.2",
     "lodash.ismatch": "^4.4.0",
